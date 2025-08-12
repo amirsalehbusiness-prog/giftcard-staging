@@ -214,9 +214,9 @@ export function UserProfile({ onLogout }: UserProfileProps) {
         {/* Content */}
         <div className="space-y-6">
           {activeTab === 'gifts' && (
-            <div className="grid gap-6">
-              {currentUser.giftCards.map((gift: any) => (
-                <Card key={gift.id} className="rounded-2xl overflow-hidden">
+  <div className="grid gap-6">
+    {(currentUser.giftCards ?? []).map((gift: any) => (
+      <Card key={gift.id} className="rounded-2xl overflow-hidden">
                   <CardHeader className="bg-gradient-to-r from-blue-50 to-orange-50">
                     <div className="flex items-start justify-between">
                       <div>
@@ -381,6 +381,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   </CardContent>
                 </Card>
               ))}
+              
             </div>
           )}
 
