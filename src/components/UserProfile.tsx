@@ -203,9 +203,9 @@ export function UserProfile({ onLogout }: UserProfileProps) {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-3 lg:order-1">
             {activeTab === 'gifts' && (
               <div className="space-y-4">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">کارت‌های هدیه دریافتی</h2>
@@ -415,48 +415,104 @@ export function UserProfile({ onLogout }: UserProfileProps) {
             )}
           </div>
 
-          {/* Right Sidebar */}
-          <div className="lg:col-span-1">
+          {/* Right Sidebar - Moved to right */}
+          <div className="lg:col-span-1 lg:order-2">
             <div className="sticky top-24 space-y-6">
               {/* User Profile Card */}
-              <Card className="rounded-2xl">
-                <CardHeader className="text-center">
-                  <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-[#0095da] to-[#ff4f00] flex items-center justify-center text-white mx-auto mb-4">
+              <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+                <CardHeader className="text-center pb-4">
+                  <div className="relative">
+                    <div className="h-24 w-24 rounded-3xl bg-gradient-to-br from-[#0095da] to-[#ff4f00] flex items-center justify-center text-white mx-auto mb-4 shadow-xl">
                     <User size={32} />
+                      <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                        <div className="h-3 w-3 bg-white rounded-full"></div>
+                      </div>
+                    </div>
                   </div>
-                  <CardTitle className="text-lg">{currentUser.name || 'کاربر'}</CardTitle>
-                  <p className="text-gray-600">{formatPhoneNumber(loggedInUser || '')}</p>
+                  <CardTitle className="text-xl font-bold text-gray-800 mb-1">
+                    {currentUser.name || 'کاربر گرامی'}
+                  </CardTitle>
+                  <p className="text-gray-500 text-sm font-medium">
+                    {formatPhoneNumber(loggedInUser || '')}
+                  </p>
+                  <div className="mt-3">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
+                      آنلاین
+                    </span>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-xl">
-                      <span className="text-sm text-gray-600">کارت‌های دریافتی</span>
-                      <span className="font-bold text-blue-600">{(currentUser.giftCards ?? []).length}</span>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-blue-500 rounded-xl flex items-center justify-center">
+                          <Gift size={18} className="text-white" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-gray-800">کارت‌های دریافتی</span>
+                          <div className="text-xs text-gray-600">مجموع هدایا</div>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-2xl font-bold text-blue-600">{(currentUser.giftCards ?? []).length}</span>
+                        <div className="text-xs text-blue-500">عدد</div>
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-xl">
-                      <span className="text-sm text-gray-600">تاریخ‌های ذخیره شده</span>
-                      <span className="font-bold text-green-600">{savedDates.length}</span>
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-2xl border border-green-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 bg-green-500 rounded-xl flex items-center justify-center">
+                          <Calendar size={18} className="text-white" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-gray-800">تاریخ‌های ذخیره شده</span>
+                          <div className="text-xs text-gray-600">یادداشت‌ها</div>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-2xl font-bold text-green-600">{savedDates.length}</span>
+                        <div className="text-xs text-green-500">مورد</div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               {/* Navigation Tabs */}
-              <Card className="rounded-2xl">
-                <CardContent className="p-2">
-                  <div className="space-y-1">
+              <Card className="rounded-3xl shadow-lg border-0 bg-white">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <div className="h-2 w-2 bg-[#0095da] rounded-full"></div>
+                    منوی اصلی
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="space-y-2">
                     <button
                       onClick={() => setActiveTab('gifts')}
-                      className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all ${
+                      className={`w-full flex items-center gap-4 py-4 px-4 rounded-2xl transition-all duration-200 ${
                         activeTab === 'gifts'
-                          ? 'bg-[#0095da] text-white shadow-md'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'bg-gradient-to-r from-[#0095da] to-[#0085ca] text-white shadow-lg transform scale-[1.02]'
+                          : 'text-gray-600 hover:bg-gray-50 hover:scale-[1.01]'
                       }`}
                     >
-                      <Gift size={20} />
-                      <span className="font-medium">کارت‌های هدیه</span>
-                      <Badge className={`mr-auto rounded-full text-xs ${
-                        activeTab === 'gifts' ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-600'
+                      <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
+                        activeTab === 'gifts' ? 'bg-white/20' : 'bg-blue-100'
+                      }`}>
+                        <Gift size={20} className={activeTab === 'gifts' ? 'text-white' : 'text-blue-600'} />
+                      </div>
+                      <div className="flex-1 text-right">
+                        <div className={`font-semibold ${activeTab === 'gifts' ? 'text-white' : 'text-gray-800'}`}>
+                          کارت‌های هدیه
+                        </div>
+                        <div className={`text-sm ${activeTab === 'gifts' ? 'text-white/80' : 'text-gray-500'}`}>
+                          مدیریت هدایا
+                        </div>
+                      </div>
+                      <Badge className={`rounded-full text-xs font-bold ${
+                        activeTab === 'gifts' 
+                          ? 'bg-white/20 text-white border border-white/30' 
+                          : 'bg-blue-100 text-blue-600 border border-blue-200'
                       }`}>
                         {(currentUser.giftCards ?? []).length}
                       </Badge>
@@ -464,16 +520,29 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                     
                     <button
                       onClick={() => setActiveTab('calendar')}
-                      className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all ${
+                      className={`w-full flex items-center gap-4 py-4 px-4 rounded-2xl transition-all duration-200 ${
                         activeTab === 'calendar'
-                          ? 'bg-[#0095da] text-white shadow-md'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'bg-gradient-to-r from-[#0095da] to-[#0085ca] text-white shadow-lg transform scale-[1.02]'
+                          : 'text-gray-600 hover:bg-gray-50 hover:scale-[1.01]'
                       }`}
                     >
-                      <Calendar size={20} />
-                      <span className="font-medium">تقویم</span>
-                      <Badge className={`mr-auto rounded-full text-xs ${
-                        activeTab === 'calendar' ? 'bg-white/20 text-white' : 'bg-green-100 text-green-600'
+                      <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${
+                        activeTab === 'calendar' ? 'bg-white/20' : 'bg-green-100'
+                      }`}>
+                        <Calendar size={20} className={activeTab === 'calendar' ? 'text-white' : 'text-green-600'} />
+                      </div>
+                      <div className="flex-1 text-right">
+                        <div className={`font-semibold ${activeTab === 'calendar' ? 'text-white' : 'text-gray-800'}`}>
+                          تقویم
+                        </div>
+                        <div className={`text-sm ${activeTab === 'calendar' ? 'text-white/80' : 'text-gray-500'}`}>
+                          یادداشت‌ها
+                        </div>
+                      </div>
+                      <Badge className={`rounded-full text-xs font-bold ${
+                        activeTab === 'calendar' 
+                          ? 'bg-white/20 text-white border border-white/30' 
+                          : 'bg-green-100 text-green-600 border border-green-200'
                       }`}>
                         {savedDates.length}
                       </Badge>
@@ -483,28 +552,77 @@ export function UserProfile({ onLogout }: UserProfileProps) {
               </Card>
 
               {/* Quick Stats */}
-              <Card className="rounded-2xl">
+              <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-white to-purple-50">
                 <CardHeader>
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <Star size={16} />
-                    آمار سریع
+                  <CardTitle className="text-lg font-bold text-gray-800 flex items-center gap-3">
+                    <div className="h-10 w-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                      <Star size={18} className="text-white" />
+                    </div>
+                    <div>
+                      <div>آمار سریع</div>
+                      <div className="text-sm font-normal text-gray-500">خلاصه فعالیت‌ها</div>
+                    </div>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">کل ارزش دریافتی</span>
-                      <span className="font-semibold text-green-600">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-2xl border border-emerald-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 bg-emerald-500 rounded-lg flex items-center justify-center">
+                          <span className="text-white text-sm font-bold">💰</span>
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-gray-800">کل ارزش دریافتی</span>
+                          <div className="text-xs text-gray-600">مجموع هدایا</div>
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <span className="text-lg font-bold text-emerald-600">
                         {(currentUser.giftCards ?? [])
                           .reduce((sum: number, gift: any) => sum + (gift.totalValue || gift.totalPrice || 0), 0)
-                          .toLocaleString('fa-IR')} تومان
+                          .toLocaleString('fa-IR')}
                       </span>
+                        <div className="text-xs text-emerald-500">تومان</div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">کارت‌های فعال</span>
-                      <span className="font-semibold text-blue-600">
+                    <div className="flex items-center justify-between p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl border border-blue-200">
+                      <div className="flex items-center gap-3">
+                        <div className="h-8 w-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                          <CheckCircle size={16} className="text-white" />
+                        </div>
+                        <div>
+                          <span className="text-sm font-semibold text-gray-800">کارت‌های فعال</span>
+                          <div className="text-xs text-gray-600">قابل استفاده</div>
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-lg font-bold text-blue-600">
                         {(currentUser.giftCards ?? []).filter((gift: any) => gift.status !== 'used').length}
                       </span>
+                        <div className="text-xs text-blue-500">عدد</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Action Buttons */}
+              <Card className="rounded-3xl shadow-lg border-0 bg-gradient-to-br from-white to-orange-50">
+                <CardContent className="p-6">
+                  <div className="space-y-3">
+                    <Button
+                      onClick={handleLogout}
+                      variant="outline"
+                      className="w-full rounded-2xl border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200 py-3"
+                    >
+                      <LogOut size={18} className="ml-2" />
+                      خروج از حساب
+                    </Button>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500 mb-2">نسخه برنامه</div>
+                      <Badge variant="outline" className="rounded-full text-xs">
+                        v1.0.0 - نمایشی
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
