@@ -52,9 +52,17 @@ export type StepInfo = {
 export type UserAccount = {
   id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
+  nationalId?: string;
   phone: string;
   password: string;
   email?: string;
+  birthDate?: string;
+  giftPreferences?: {
+    category: string;
+    subcategory: string;
+  };
   giftCards: GiftCard[]; // ← اضافه شد
 };
 // فقط برای بیلد؛ اگر لازم شد بعداً دقیق‌ترش کن
