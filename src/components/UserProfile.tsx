@@ -210,7 +210,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                 <nav className="space-y-2">
                   <button
                     onClick={() => setActiveTab('profile')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
                       activeTab === 'profile' 
                         ? 'bg-[#0095da] text-white' 
                         : 'text-gray-700 hover:bg-gray-100'
@@ -222,7 +222,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   
                   <button
                     onClick={() => setActiveTab('giftCards')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
                       activeTab === 'giftCards' 
                         ? 'bg-[#0095da] text-white' 
                         : 'text-gray-700 hover:bg-gray-100'
@@ -239,7 +239,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   
                   <button
                     onClick={() => setActiveTab('calendar')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
                       activeTab === 'calendar' 
                         ? 'bg-[#0095da] text-white' 
                         : 'text-gray-700 hover:bg-gray-100'
@@ -251,7 +251,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   
                   <button
                     onClick={() => setActiveTab('settings')}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
                       activeTab === 'settings' 
                         ? 'bg-[#0095da] text-white' 
                         : 'text-gray-700 hover:bg-gray-100'
