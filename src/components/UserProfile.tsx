@@ -215,39 +215,51 @@ export function UserProfile({ onLogout }: UserProfileProps) {
         <div className="space-y-6">
           {activeTab === 'gifts' && (
   <div className="grid gap-6">
-    {(currentUser.giftCards ?? []).map((gift: any) => (
+    {(currentUser.giftCards ?? []).map((gift: any) => {
+      // Add safety checks and default values
+      const safeGift = {
+        ...gift,
+        vouchers: gift.vouchers || [],
+        totalValue: gift.totalValue || gift.totalPrice || 0,
+        status: gift.status || 'active',
+        receivedDate: gift.receivedDate || gift.createdAt || new Date().toLocaleDateString('fa-IR')
+      };
+      
+      return (
       <Card key={gift.id} className="rounded-2xl overflow-hidden">
                   <CardHeader className="bg-gradient-to-r from-blue-50 to-orange-50">
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-xl mb-2">{gift.occasion}</CardTitle>
+                        <CardTitle className="text-xl mb-2">
+                          {gift.occasion === 'custom' ? gift.customOccasion || 'بهانه دلخواه' : gift.occasion}
+                        </CardTitle>
                         <div className="space-y-1 text-sm text-gray-600">
                           <div className="flex items-center gap-2">
                             <User size={16} />
-                            <span>فرستنده: {gift.senderName}</span>
+                            <span>فرستنده: {gift.senderName || 'نامشخص'}</span>
                           </div>
                           <div className="flex items-center gap-2 mb-2">
                             <Phone size={16} className="text-gray-600" />
                             <span className="text-sm text-gray-600">
-                              گیرنده: {gift.recipientName} ({gift.recipientPhone || loggedInUser})
+                              گیرنده: {gift.recipientName || 'نامشخص'} ({gift.recipientPhone || loggedInUser})
                             </span>
                           </div>
                           <div className="flex items-center gap-2 mb-3">
                             <Calendar size={16} className="text-gray-600" />
-                            <span>تاریخ دریافت: {gift.receivedDate}</span>
+                            <span>تاریخ دریافت: {safeGift.receivedDate}</span>
                           </div>
                         </div>
                       </div>
                       <Badge 
                         className={`rounded-xl ${
-                          gift.status === 'active' 
+                          safeGift.status === 'active' 
                             ? 'bg-green-100 text-green-800' 
-                            : gift.status === 'used'
+                            : safeGift.status === 'used'
                             ? 'bg-gray-100 text-gray-600'
                             : 'bg-red-100 text-red-800'
                         }`}
                       >
-                        {gift.status === 'active' ? 'فعال' : gift.status === 'used' ? 'استفاده شده' : 'منقضی'}
+                        {safeGift.status === 'active' ? 'فعال' : safeGift.status === 'used' ? 'استفاده شده' : 'منقضی'}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -255,20 +267,20 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   <CardContent className="p-6">
                     {/* Message */}
                     <div className="bg-gray-50 rounded-xl p-4 mb-6">
-                      <p className="text-gray-700 leading-relaxed">{gift.message}</p>
+                      <p className="text-gray-700 leading-relaxed">{gift.message || 'پیام تبریک'}</p>
                     </div>
 
                     {/* Total Value */}
                     <div className="text-center mb-6">
                       <div className="text-3xl font-bold text-[#0095da] mb-1">
-                        {gift.totalValue.toLocaleString('fa-IR')} تومان
+                        {safeGift.totalValue.toLocaleString('fa-IR')} تومان
                       </div>
                       <div className="text-sm text-gray-600">ارزش کل هدیه</div>
                     </div>
 
                     {/* Vouchers */}
                     <div className="grid gap-4 md:grid-cols-2">
-                      {gift.vouchers.map((voucher: any) => (
+                      {safeGift.vouchers.map((voucher: any) => (
                         <div key={voucher.id} className="border rounded-xl p-4 bg-white">
                           <div className="flex items-center gap-3 mb-3">
                             <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-lg ${
@@ -380,7 +392,8 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              );
+    })}
               
             </div>
           )}

@@ -10,6 +10,7 @@ import {
   FLYTODAY_VOUCHERS,
 } from "../data/packages";
 import { formatPrice } from "../utils/pricing";
+import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS } from "../data/packages";
 import { useState } from "react";
 
 type ReviewCardProps = {
@@ -71,16 +72,44 @@ export function ReviewCard({
         recipientName,
         recipientPhone,
         senderName,
-        message: "پیام تبریک", // You can pass the actual message if needed
+        message: "پیام تبریک",
         internet,
         voice,
         dkVoucher,
         ftVoucher,
         oneYear,
         totalPrice,
+        totalValue: totalPrice, // Add totalValue for UserProfile compatibility
         isPaid: true,
         createdAt: new Date().toISOString(),
-        vouchers: [] // Add vouchers if needed
+        status: 'active',
+        receivedDate: new Date().toLocaleDateString('fa-IR'),
+        vouchers: [
+          ...(internet ? [{
+            id: `internet_${Date.now()}`,
+            type: 'internet',
+            amount: INTERNET_PACKS.find(p => p.id === internet)?.label + ' گیگ',
+            used: false
+          }] : []),
+          ...(voice ? [{
+            id: `voice_${Date.now()}`,
+            type: 'voice', 
+            amount: VOICE_PACKS.find(p => p.id === voice)?.label,
+            used: false
+          }] : []),
+          ...(dkVoucher ? [{
+            id: `dk_${Date.now()}`,
+            type: 'digikala',
+            amount: DIGIKALA_VOUCHERS.find(p => p.id === dkVoucher)?.label,
+            used: false
+          }] : []),
+          ...(ftVoucher ? [{
+            id: `ft_${Date.now()}`,
+            type: 'flytoday',
+            amount: FLYTODAY_VOUCHERS.find(p => p.id === ftVoucher)?.label,
+            used: false
+          }] : [])
+        ]
       };
 
       // Use the UserContext's createUserAccount function
