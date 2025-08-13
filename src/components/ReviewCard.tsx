@@ -18,6 +18,7 @@ type ReviewCardProps = {
   recipientName: string;
   recipientPhone: string | null;
   senderName: string;
+  message: string;
   internet: string | null;
   voice: string | null;
   dkVoucher: string | null;
@@ -35,6 +36,7 @@ export function ReviewCard({
   recipientName,
   recipientPhone,
   senderName,
+  message,
   internet,
   voice,
   dkVoucher,

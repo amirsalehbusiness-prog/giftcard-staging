@@ -117,7 +117,7 @@ function AppContent() {
           </div>
         </header>
 
-        <main className="mx-auto max-w-3xl px-4 py-6">
+        <main className="mx-auto max-w-7xl px-4 py-6">
           <UserProfile onLogout={() => setCurrentPage("home")} />
         </main>
       </div>
@@ -269,7 +269,7 @@ function AppContent() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Wizard */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:max-w-none">
           <Wizard
             step={step}
             data={data}
@@ -283,7 +283,7 @@ function AppContent() {
         </div>
 
         {/* Preview */}
-        <div className="lg:sticky lg:top-16">
+        <div className="lg:sticky lg:top-20 lg:max-w-none">
        <PreviewCard
   occasion={data.occasion ?? "birthday"}   // ← تضمین کن همیشه string بدی
   customOccasion={data.customOccasion}
