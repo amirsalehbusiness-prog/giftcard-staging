@@ -50,7 +50,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   const { userAccounts, loggedInUser, updateUserAccount } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'settings'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'settings'>('giftCards');
   const [isEditing, setIsEditing] = useState(false);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
@@ -209,18 +209,6 @@ export function UserProfile({ onLogout }: UserProfileProps) {
               <CardContent className="p-4" style={{ paddingTop: '20px' }}>
                 <nav className="space-y-2">
                   <button
-                    onClick={() => setActiveTab('profile')}
-                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
-                      activeTab === 'profile' 
-                        ? 'bg-[#0095da] text-white' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <User size={20} />
-                    <span>پروفایل</span>
-                  </button>
-                  
-                  <button
                     onClick={() => setActiveTab('giftCards')}
                     className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
                       activeTab === 'giftCards' 
@@ -246,7 +234,19 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                     }`}
                   >
                     <Calendar size={20} />
-                    <span>تقویم</span>
+                    <span>تقویم مناسبت</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
+                      activeTab === 'profile' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <User size={20} />
+                    <span>پروفایل</span>
                   </button>
                   
                   <button
