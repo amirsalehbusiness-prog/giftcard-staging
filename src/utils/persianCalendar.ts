@@ -23,85 +23,101 @@ export class PersianDate {
   }
 
   private gregorianToPersian(gy: number, gm: number, gd: number): { year: number; month: number; day: number } {
-    const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+    // Convert Gregorian date to Julian day number
+    const a = Math.floor((14 - gm) / 12);
+    const y = gy - a;
+    const m = gm + 12 * a - 3;
     
-    let gy2: number;
-    let jy: number;
+    const julianDay = gd + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) + 1721119;
     
-    if (gy <= 1600) {
-      jy = 0;
-      gy2 = gy + 1;
-    } else {
-      jy = 979;
-      gy2 = gy - 1600;
+    // Convert Julian day to Persian date
+    const PERSIAN_EPOCH = 1948321; // Julian day number for 1 Farvardin 1
+    let daysSinceEpoch = julianDay - PERSIAN_EPOCH;
+    
+    // Find the year
+    let persianYear = 1;
+    while (daysSinceEpoch >= (this.isLeapPersianYear(persianYear) ? 366 : 365)) {
+      daysSinceEpoch -= this.isLeapPersianYear(persianYear) ? 366 : 365;
+      persianYear++;
     }
     
-    const gy3 = gy2 > 0 ? gy2 : gy2 + 1;
-    let days = (365 * gy3) + (Math.floor((gy3 + 3) / 4)) + (Math.floor((gy3 + 99) / 100)) - (Math.floor((gy3 + 399) / 400)) - 80 + gd + (gm < 3 ? 0 : g_d_m[gm - 1]);
-    
-    if ((gy3 % 4 === 0 && gy3 % 100 !== 0) || (gy3 % 400 === 0)) {
-      if (gm > 2) days += 1;
-    }
-    
-    const jy3 = Math.floor(days / 365.2422) + 979;
-    days = days - Math.floor((jy3 - 979) * 365.2422);
-    
-    let jp = 0;
-    for (let i = 0; i < 12; i++) {
-      const monthDays = i < 6 ? 31 : (i < 11 ? 30 : (this.isLeapPersianYear(jy3) ? 30 : 29));
-      if (days <= monthDays) {
-        jp = i + 1;
+    // Find the month
+    let persianMonth = 1;
+    while (persianMonth <= 12) {
+      let monthDays;
+      if (persianMonth <= 6) {
+        monthDays = 31;
+      } else if (persianMonth <= 11) {
+        monthDays = 30;
+      } else {
+        monthDays = this.isLeapPersianYear(persianYear) ? 30 : 29;
+      }
+      
+      if (daysSinceEpoch < monthDays) {
         break;
       }
-      days -= monthDays;
+      
+      daysSinceEpoch -= monthDays;
+      persianMonth++;
     }
     
-    return { year: jy3, month: jp, day: Math.floor(days) };
+    const persianDay = daysSinceEpoch + 1;
+    
+    return { year: persianYear, month: persianMonth, day: persianDay };
   }
 
   private persianToGregorian(jy: number, jm: number, jd: number): Date {
-    const epyear = jy - 979;
-    let epochday = 365 * epyear;
-    epochday += Math.floor(epyear / 33) * 8;
-    epochday += Math.floor(((epyear % 33) + 3) / 4);
+    // Simplified and more accurate Persian to Gregorian conversion
+    // Based on the algorithm from Kazimierz M. Borkowski
     
-    for (let i = 0; i < jm; i++) {
-      if (i < 6) epochday += 31;
-      else if (i < 11) epochday += 30;
-      else epochday += this.isLeapPersianYear(jy) ? 30 : 29;
+    const PERSIAN_EPOCH = 1948321; // Julian day number for 1 Farvardin 1 (March 22, 622 CE)
+    
+    // Calculate total days from Persian epoch
+    let totalDays = 0;
+    
+    // Add days for complete years
+    for (let year = 1; year < jy; year++) {
+      totalDays += this.isLeapPersianYear(year) ? 366 : 365;
     }
     
-    epochday += jd;
+    // Add days for complete months in current year
+    for (let month = 1; month < jm; month++) {
+      if (month <= 6) {
+        totalDays += 31;
+      } else if (month <= 11) {
+        totalDays += 30;
+      } else {
+        totalDays += this.isLeapPersianYear(jy) ? 30 : 29;
+      }
+    }
     
-    const gregorianEpoch = new Date(622, 2, 22); // March 22, 622 CE
-    const result = new Date(gregorianEpoch.getTime() + (epochday - 1) * 24 * 60 * 60 * 1000);
+    // Add remaining days
+    totalDays += jd - 1;
     
-    return result;
+    // Convert Julian day to Gregorian date
+    const julianDay = PERSIAN_EPOCH + totalDays;
+    
+    // Julian day to Gregorian conversion
+    const a = julianDay + 32044;
+    const b = Math.floor((4 * a + 3) / 146097);
+    const c = a - Math.floor((146097 * b) / 4);
+    const d = Math.floor((4 * c + 3) / 1461);
+    const e = c - Math.floor((1461 * d) / 4);
+    const m = Math.floor((5 * e + 2) / 153);
+    
+    const day = e - Math.floor((153 * m + 2) / 5) + 1;
+    const month = m + 3 - 12 * Math.floor(m / 10);
+    const year = 100 * b + d - 4800 + Math.floor(m / 10);
+    
+    return new Date(year, month - 1, day);
   }
 
   private isLeapPersianYear(year: number): boolean {
-    const breaks = [
-      -61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181, 1210,
-      1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178
-    ];
-    
-    const jp = breaks.length;
-    let jump = 0;
-    for (let j = 1; j < jp; j++) {
-      const jm = breaks[j];
-      jump = jm - breaks[j - 1];
-      if (year < jm) break;
-    }
-    
-    let n = year - breaks[jp - 1];
-    if (n < jump) {
-      if (jump - n < 6) n = n - jump + ((jump + 4) / 6) * 6;
-      const leap = ((n + 1) % 33) % 4;
-      if (jump === 33 && leap === 1) return true;
-      if (leap === 1) return true;
-    }
-    
-    return false;
+    // Simplified leap year calculation for Persian calendar
+    // Based on the 33-year cycle with 8 leap years
+    const cycle = year % 128;
+    const leapYears = [1, 5, 9, 13, 17, 22, 26, 30, 34, 38, 42, 46, 50, 55, 59, 63, 67, 71, 75, 79, 84, 88, 92, 96, 100, 104, 108, 112, 116, 121, 125];
+    return leapYears.includes(cycle);
   }
 
   // Format Persian date
