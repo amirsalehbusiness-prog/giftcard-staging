@@ -71,7 +71,7 @@ export function ReviewCard({
         recipientName,
         recipientPhone,
         senderName,
-        message: "پیام تبریک",
+        message: message || "پیام تبریک ارسال شده است",
         internet,
         voice,
         dkVoucher,

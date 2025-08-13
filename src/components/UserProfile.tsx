@@ -273,7 +273,9 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                                 پیام تبریک
                               </h4>
                               <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
-                                <p className="text-gray-700 leading-relaxed">{safeGift.message}</p>
+                                <p className="text-gray-700 leading-relaxed">
+                                  {gift.message || safeGift.message || 'پیام تبریک ارسال شده است'}
+                                </p>
                               </div>
                             </div>
 
