@@ -219,7 +219,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
       // Add safety checks and default values
       const safeGift = {
         ...gift,
-        vouchers: gift.vouchers || [],
+        vouchers: Array.isArray(gift.vouchers) ? gift.vouchers : [],
         totalValue: gift.totalValue || gift.totalPrice || 0,
         status: gift.status || 'active',
         receivedDate: gift.receivedDate || gift.createdAt || new Date().toLocaleDateString('fa-IR')
