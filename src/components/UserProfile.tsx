@@ -461,7 +461,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
               <div className="space-y-6">
                 {/* Filters and Search */}
                 <Card className="rounded-2xl">
-                  <CardContent className="p-4">
+                  <CardContent className="p-4" style={{ paddingTop: '20px' }}>
                     <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
                       <div className="flex items-center gap-4 w-full lg:w-auto">
                         <div className="relative flex-1 lg:w-80">
