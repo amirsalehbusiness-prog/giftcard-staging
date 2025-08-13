@@ -442,7 +442,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   </Card>
 
                   <Card className="rounded-2xl">
-                    <CardContent className="p-6 text-center">
+                    <CardContent className="p-6 text-center" style={{ paddingTop: '24px' }}>
                       <div className="h-12 w-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 mx-auto mb-3">
                         <Star size={24} />
                       </div>
