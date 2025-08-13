@@ -31,11 +31,14 @@ export function UserProvider({ children }: { children: ReactNode }) {
         id: Date.now().toString(), // or use a better unique id generator if available
         name: '', // or prompt for name, or set a default
         phone,
-        password: phone, // Use phone number as password for testing
+        password: phone, // Use phone number as password
         giftCards: [giftCard]
       };
       setUserAccounts(prev => [...prev, newAccount]);
     }
+    
+    // Debug log to verify account creation
+    console.log('✅ User account created/updated:', { phone, password: phone });
   };
 
   const updateUserAccount = (phone: string, updates: Partial<UserAccount>) => {

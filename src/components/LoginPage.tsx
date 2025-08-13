@@ -50,7 +50,7 @@ export function LoginPage({ onLogin, onBackToHome, onLoginSuccess }: LoginPagePr
         // Check if phone exists but password is wrong
         const phoneExists = userAccounts.find(acc => acc.phone === phone);
         if (phoneExists) {
-          setError('رمز عبور اشتباه است.');
+          setError(`رمز عبور اشتباه است. رمز عبور باید ${phone} باشد.`);
         } else {
           setError('شماره موبایل یا رمز عبور اشتباه است. لطفاً ابتدا کارت هدیه ایجاد کنید.');
         }

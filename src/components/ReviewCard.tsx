@@ -59,34 +59,59 @@ export function ReviewCard({
     if (!paymentCompleted || !recipientPhone || savedRef.current) return;
 
     const KEY = "userAccounts";
-    type Account = {
-      phone?: string;
-      username?: string; // برای سازگاری به عقب
-      password: string;
-      // سایر فیلدهای قبلی اگر بود، همونجا حفظ می‌شن چون ما upsert می‌کنیم
-    };
 
     try {
       const phone = String(recipientPhone).trim();
-      const list: Account[] = JSON.parse(localStorage.getItem(KEY) || "[]");
+      
+      // Create gift card data
+      const giftCardData = {
+        id: Date.now().toString(),
+        occasion,
+        customOccasion,
+        recipientName,
+        recipientPhone,
+        senderName,
+        message: "پیام تبریک", // You can pass the actual message if needed
+        internet,
+        voice,
+        dkVoucher,
+        ftVoucher,
+        oneYear,
+        totalPrice,
+        isPaid: true,
+        createdAt: new Date().toISOString(),
+        vouchers: [] // Add vouchers if needed
+      };
 
-      // upsert بر اساس phone/username
-      const idx = list.findIndex(
-        (x) => x.phone === phone || x.username === phone
-      );
-
-      const next: Account =
-        idx >= 0
-          ? { ...list[idx], phone, username: phone, password: phone }
-          : { phone, username: phone, password: phone };
-
-      if (idx >= 0) list[idx] = next;
-      else list.push(next);
-
-      localStorage.setItem(KEY, JSON.stringify(list));
+      // Use the UserContext's createUserAccount function
+      // We need to access this through the context, but since we're in useEffect,
+      // we'll directly manipulate localStorage for now
+      const existingAccounts = JSON.parse(localStorage.getItem(KEY) || "[]");
+      const existingUserIndex = existingAccounts.findIndex((user: any) => user.phone === phone);
+      
+      if (existingUserIndex >= 0) {
+        // Add gift card to existing user
+        existingAccounts[existingUserIndex].giftCards = existingAccounts[existingUserIndex].giftCards || [];
+        existingAccounts[existingUserIndex].giftCards.push(giftCardData);
+        existingAccounts[existingUserIndex].password = phone; // Ensure password is set correctly
+      } else {
+        // Create new user account
+        const newAccount = {
+          id: Date.now().toString(),
+          name: recipientName || '',
+          phone,
+          password: phone, // Use phone number as password
+          giftCards: [giftCardData]
+        };
+        existingAccounts.push(newAccount);
+      }
+      
+      localStorage.setItem(KEY, JSON.stringify(existingAccounts));
 
       if (import.meta.env.DEV) {
-        console.log("✅ userAccounts updated:", next);
+        console.log("✅ userAccounts updated for phone:", phone);
+        console.log("✅ Password set to:", phone);
+        console.log("✅ All accounts:", existingAccounts);
       }
 
       savedRef.current = true; // فقط یک‌بار ذخیره کند
