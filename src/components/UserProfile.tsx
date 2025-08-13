@@ -418,7 +418,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                 {/* Quick Stats */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Card className="rounded-2xl">
-                    <CardContent className="p-6 text-center">
+                    <CardContent className="p-6 text-center" style={{ paddingTop: '24px' }}>
                       <div className="h-12 w-12 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 mx-auto mb-3">
                         <Gift size={24} />
                       </div>
