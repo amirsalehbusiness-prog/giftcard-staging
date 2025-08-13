@@ -34,6 +34,7 @@ import { Separator } from './ui/separator';
 import { useUser } from '../contexts/UserContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { PersianCalendar } from './PersianCalendar';
+import { GiftCardDetails } from './GiftCardDetails';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
 import type { SavedDate, GiftCard } from '../types';
@@ -524,126 +525,16 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                     </CardContent>
                   </Card>
                 ) : (
-                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : 'space-y-4'}>
                     {filteredGiftCards.map((giftCard) => (
-                      <Card key={giftCard.id} className="rounded-2xl hover:shadow-lg transition-all">
-                        <CardContent className={viewMode === 'grid' ? 'p-6' : 'p-4'}>
-                          {viewMode === 'grid' ? (
-                            // Grid View
-                            <div className="space-y-4">
-                              <div className="flex items-center justify-between">
-                                <Badge className={`rounded-xl ${getStatusColor(giftCard.status || 'active')}`}>
-                                  {getStatusIcon(giftCard.status || 'active')}
-                                  <span className="mr-1">
-                                    {giftCard.status === 'active' ? 'فعال' :
-                                     giftCard.status === 'used' ? 'استفاده شده' :
-                                     giftCard.status === 'expired' ? 'منقضی' : 'نامشخص'}
-                                  </span>
-                                </Badge>
-                                <Button variant="ghost" className="rounded-xl p-2">
-                                  <MoreVertical size={16} />
-                                </Button>
-                              </div>
-
-                              <div>
-                                <h3 className="font-bold text-gray-800 mb-1">
-                                  {getOccasionLabel(giftCard.occasion || '')}
-                                </h3>
-                                <p className="text-sm text-gray-600">
-                                  از طرف: {giftCard.senderName || 'نامشخص'}
-                                </p>
-                              </div>
-
-                              <div className="bg-gray-50 rounded-xl p-3">
-                                <div className="text-sm text-gray-600 mb-1">محتویات هدیه:</div>
-                                <div className="space-y-1">
-                                  {giftCard.vouchers?.map((voucher, index) => (
-                                    <div key={index} className="flex items-center justify-between text-xs">
-                                      <span>{voucher.type}: {voucher.amount}</span>
-                                      <Badge variant={voucher.used ? 'secondary' : 'solid'} className="text-xs">
-                                        {voucher.used ? 'استفاده شده' : 'فعال'}
-                                      </Badge>
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-
-                              {giftCard.totalValue && (
-                                <div className="text-center p-3 bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl">
-                                  <div className="text-lg font-bold text-gray-800">
-                                    {formatPrice(giftCard.totalValue)} تومان
-                                  </div>
-                                  <div className="text-xs text-gray-600">ارزش کل</div>
-                                </div>
-                              )}
-
-                              <div className="flex gap-2">
-                                <Button variant="outline" className="flex-1 rounded-xl text-xs">
-                                  <Eye size={14} className="ml-1" />
-                                  مشاهده
-                                </Button>
-                                <Button variant="outline" className="flex-1 rounded-xl text-xs">
-                                  <Share2 size={14} className="ml-1" />
-                                  اشتراک
-                                </Button>
-                              </div>
-
-                              <div className="text-xs text-gray-500 text-center">
-                                دریافت شده: {giftCard.receivedDate || 'نامشخص'}
-                              </div>
-                            </div>
-                          ) : (
-                            // List View
-                            <div className="flex items-center gap-4">
-                              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#0095da] to-[#ff4f00] flex items-center justify-center text-white flex-shrink-0">
-                                <Gift size={20} />
-                              </div>
-                              
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 mb-1">
-                                  <h3 className="font-semibold text-gray-800 truncate">
-                                    {getOccasionLabel(giftCard.occasion || '')}
-                                  </h3>
-                                  <Badge className={`rounded-xl text-xs ${getStatusColor(giftCard.status || 'active')}`}>
-                                    {giftCard.status === 'active' ? 'فعال' :
-                                     giftCard.status === 'used' ? 'استفاده شده' :
-                                     giftCard.status === 'expired' ? 'منقضی' : 'نامشخص'}
-                                  </Badge>
-                                </div>
-                                <p className="text-sm text-gray-600 truncate">
-                                  از طرف: {giftCard.senderName || 'نامشخص'}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {giftCard.receivedDate || 'نامشخص'}
-                                </p>
-                              </div>
-
-                              <div className="text-right flex-shrink-0">
-                                {giftCard.totalValue && (
-                                  <div className="font-bold text-gray-800">
-                                    {formatPrice(giftCard.totalValue)} تومان
-                                  </div>
-                                )}
-                                <div className="text-xs text-gray-600">
-                                  {giftCard.vouchers?.length || 0} آیتم
-                                </div>
-                              </div>
-
-                              <div className="flex gap-1 flex-shrink-0">
-                                <Button variant="ghost" className="rounded-xl p-2">
-                                  <Eye size={16} />
-                                </Button>
-                                <Button variant="ghost" className="rounded-xl p-2">
-                                  <Share2 size={16} />
-                                </Button>
-                                <Button variant="ghost" className="rounded-xl p-2">
-                                  <MoreVertical size={16} />
-                                </Button>
-                              </div>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
+                      <GiftCardDetails 
+                        key={giftCard.id} 
+                        giftCard={giftCard}
+                        onUseVoucher={(voucherId) => {
+                          // Handle voucher usage
+                          console.log('Using voucher:', voucherId);
+                        }}
+                      />
                     ))}
                   </div>
                 )}

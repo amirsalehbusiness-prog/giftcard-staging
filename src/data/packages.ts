@@ -54,3 +54,10 @@ export const PRICES = {
 export const DIGIKALA_VOUCHERS = DK_VOUCHERS;
 export const FLYTODAY_VOUCHERS = FT_VOUCHERS;
 export const PRICING = PRICES;
+
+// Purchase links for voucher redemption
+export const PURCHASE_LINKS = {
+  MCI: 'https://mci.ir/',
+  DIGIKALA: 'https://www.digikala.com/',
+  FLYTODAY: 'https://www.flytoday.ir/'
+} as const;
