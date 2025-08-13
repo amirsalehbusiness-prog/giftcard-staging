@@ -135,31 +135,31 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
           
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-white font-bold text-lg">
+                  {getOccasionLabel(giftCard.occasion || '')}
+                </h3>
+                <p className="text-white/80 text-sm">
+                  از طرف: {giftCard.senderName || 'نامشخص'}
+                </p>
+              </div>
+              
               <div className="flex items-center gap-3">
                 <div className="h-12 w-12 rounded-2xl bg-white/20 flex items-center justify-center text-white">
                   <Gift size={24} />
                 </div>
-                <div>
-                  <h3 className="text-white font-bold text-lg">
-                    {getOccasionLabel(giftCard.occasion || '')}
-                  </h3>
-                  <p className="text-white/80 text-sm">
-                    از طرف: {giftCard.senderName || 'نامشخص'}
-                  </p>
-                </div>
+                <Badge 
+                  className={`rounded-xl text-white border-white/30 ${
+                    giftCard.status === 'active' ? 'bg-[#439C55]' : 
+                    giftCard.status === 'used' ? 'bg-gray-500' :
+                    giftCard.status === 'expired' ? 'bg-red-500' : 'bg-blue-500'
+                  }`}
+                >
+                  {giftCard.status === 'active' ? 'فعال' :
+                   giftCard.status === 'used' ? 'استفاده شده' :
+                   giftCard.status === 'expired' ? 'منقضی' : 'نامشخص'}
+                </Badge>
               </div>
-              
-              <Badge 
-                className={`rounded-xl text-white border-white/30 ${
-                  giftCard.status === 'active' ? 'bg-[#439C55]' : 
-                  giftCard.status === 'used' ? 'bg-gray-500' :
-                  giftCard.status === 'expired' ? 'bg-red-500' : 'bg-blue-500'
-                }`}
-              >
-                {giftCard.status === 'active' ? 'فعال' :
-                 giftCard.status === 'used' ? 'استفاده شده' :
-                 giftCard.status === 'expired' ? 'منقضی' : 'نامشخص'}
-              </Badge>
             </div>
 
             {giftCard.totalValue && (
