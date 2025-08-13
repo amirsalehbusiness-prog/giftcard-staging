@@ -67,6 +67,9 @@ export type UserAccount = {
 };
 // فقط برای بیلد؛ اگر لازم شد بعداً دقیق‌ترش کن
 export type GiftCard = {
+  amount: number;
+  totalValue: number;
+  status: string;
   id: string;
   occasion?: string | null;
   customOccasion?: string;

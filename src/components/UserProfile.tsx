@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+
 import { 
   User, 
   Gift, 
@@ -38,7 +39,8 @@ import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
-import type { SavedDate, GiftCard } from '../types';
+import type { GiftCard } from '../types';
+import type { SavedDate } from '../types/calendar';
 
 type UserProfileProps = {
   onLogout: () => void;
@@ -57,6 +59,9 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Settings tab switches state
+  const [emailNotifications, setEmailNotifications] = useState(true);
 
   // Form states for editing
   const [editForm, setEditForm] = useState({
@@ -447,7 +452,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <Star size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.totalValue || 0), 0) || 0)}
+                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.amount || 0), 0) || 0)}
                       </div>
                       <div className="text-sm text-gray-600">کل ارزش دریافتی (تومان)</div>
                     </CardContent>
@@ -558,7 +563,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Settings size={20} />
-                      تنظیمات حساب کاربری
+                      تنظیمات
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -567,7 +572,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <div className="font-semibold text-gray-800">اعلان‌های ایمیل</div>
                         <div className="text-sm text-gray-600">دریافت اعلان‌ها از طریق ایمیل</div>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch checked={emailNotifications} onCheckedChange={setEmailNotifications} />
                     </div>
 
                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -575,7 +580,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <div className="font-semibold text-gray-800">اعلان‌های پیامکی</div>
                         <div className="text-sm text-gray-600">دریافت اعلان‌ها از طریق پیامک</div>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch checked={true} onCheckedChange={() => {}} />
                     </div>
 
                     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -583,7 +588,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <div className="font-semibold text-gray-800">یادآوری تاریخ‌های مهم</div>
                         <div className="text-sm text-gray-600">یادآوری تولد و مناسبت‌های مهم</div>
                       </div>
-                      <Switch defaultChecked />
+                      <Switch checked={true} onCheckedChange={() => {}} />
                     </div>
 
                     <Separator />
