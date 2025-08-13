@@ -34,6 +34,7 @@ import { Separator } from './ui/separator';
 import { useUser } from '../contexts/UserContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { PersianCalendar } from './PersianCalendar';
+import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
@@ -379,10 +380,10 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ تولد</label>
                           {isEditing ? (
-                            <Input
-                              type="date"
+                            <PersianDatePicker
                               value={editForm.birthDate}
                               onChange={(e) => setEditForm(prev => ({ ...prev, birthDate: e.target.value }))}
+                              placeholder="تاریخ تولد را انتخاب کنید"
                               className="rounded-xl"
                             />
                           ) : (
