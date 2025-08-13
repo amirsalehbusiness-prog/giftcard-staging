@@ -206,7 +206,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
             <Card className="rounded-2xl sticky top-24">
-              <CardContent className="p-4">
+              <CardContent className="p-4" style={{ paddingTop: '20px' }}>
                 <nav className="space-y-2">
                   <button
                     onClick={() => setActiveTab('profile')}
