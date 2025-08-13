@@ -430,7 +430,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   </Card>
 
                   <Card className="rounded-2xl">
-                    <CardContent className="p-6 text-center">
+                    <CardContent className="p-6 text-center" style={{ paddingTop: '24px' }}>
                       <div className="h-12 w-12 rounded-2xl bg-green-100 flex items-center justify-center text-green-600 mx-auto mb-3">
                         <CheckCircle size={24} />
                       </div>
