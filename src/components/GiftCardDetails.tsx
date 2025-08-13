@@ -150,8 +150,11 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
               </div>
               
               <Badge 
-                className="rounded-xl text-white border-white/30"
-                style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+                className={`rounded-xl text-white border-white/30 ${
+                  giftCard.status === 'active' ? 'bg-[#439C55]' : 
+                  giftCard.status === 'used' ? 'bg-gray-500' :
+                  giftCard.status === 'expired' ? 'bg-red-500' : 'bg-blue-500'
+                }`}
               >
                 {giftCard.status === 'active' ? 'فعال' :
                  giftCard.status === 'used' ? 'استفاده شده' :
@@ -250,7 +253,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
                   </div>
                   <Badge 
                     variant={voucher.used ? 'secondary' : 'solid'} 
-                    className="text-xs"
+                    className={`text-xs ${voucher.used ? '' : 'bg-[#439C55] hover:bg-[#3a8549]'}`}
                   >
                     {voucher.used ? 'استفاده شده' : 'فعال'}
                   </Badge>
@@ -411,8 +414,8 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full rounded-xl"
-                          onClick={() => window.open(getVoucherLink(voucher.type || ''), '_blank')}
+                          variant={voucher.used ? 'secondary' : 'solid'}
+                          className={`rounded-xl ${voucher.used ? '' : 'bg-[#439C55] hover:bg-[#3a8549] text-white'}`}
                         >
                           <ExternalLink size={14} className="ml-2" />
                           استفاده در وب‌سایت
