@@ -10,7 +10,6 @@ import {
   FLYTODAY_VOUCHERS,
 } from "../data/packages";
 import { formatPrice } from "../utils/pricing";
-import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS } from "../data/packages";
 import { useState } from "react";
 
 type ReviewCardProps = {
