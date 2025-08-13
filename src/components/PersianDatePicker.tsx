@@ -15,6 +15,8 @@ export function PersianDatePicker({ value, onChange, placeholder, className }: P
   const [isOpen, setIsOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(() => getCurrentPersianDate());
   const [selectedDate, setSelectedDate] = useState<{ year: number; month: number; day: number } | null>(null);
+  const [showMonthSelector, setShowMonthSelector] = useState(false);
+  const [showYearSelector, setShowYearSelector] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const monthNames = [
@@ -119,6 +121,23 @@ export function PersianDatePicker({ value, onChange, placeholder, className }: P
     return '';
   };
 
+  const handleMonthSelect = (monthIndex: number) => {
+    setCurrentDate(prev => ({ ...prev, month: monthIndex + 1 }));
+    setShowMonthSelector(false);
+  };
+
+  const handleYearSelect = (year: number) => {
+    setCurrentDate(prev => ({ ...prev, year }));
+    setShowYearSelector(false);
+  };
+
+  // Generate years from 1300 to current year + 10
+  const currentPersianYear = getCurrentPersianDate().year;
+  const availableYears = Array.from(
+    { length: currentPersianYear - 1300 + 11 }, 
+    (_, i) => 1300 + i
+  ).reverse();
+
   const calendarDays = generateCalendarDays();
   const today = getCurrentPersianDate();
 
@@ -151,9 +170,89 @@ export function PersianDatePicker({ value, onChange, placeholder, className }: P
               <ChevronLeft size={18} />
             </Button>
             
-            <div className="text-center">
-              <div className="font-bold text-gray-800">
-                {monthNames[currentDate.month - 1]} {formatPersianNumber(currentDate.year)}
+            <div className="text-center relative">
+              <div className="flex items-center gap-3">
+                {/* Month Selector */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowMonthSelector(!showMonthSelector);
+                      setShowYearSelector(false);
+                    }}
+                    className="font-bold text-gray-800 hover:text-[#0095da] transition-colors px-2 py-1 rounded-lg hover:bg-blue-50"
+                  >
+                    {monthNames[currentDate.month - 1]}
+                  </button>
+                  
+                  {showMonthSelector && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowMonthSelector(false)}
+                      />
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-20 p-2 min-w-[180px]">
+                        <div className="grid grid-cols-2 gap-1">
+                          {monthNames.map((month, index) => (
+                            <button
+                              key={index}
+                              onClick={() => handleMonthSelect(index)}
+                              className={`
+                                px-2 py-1 text-sm rounded-lg transition-all text-right
+                                ${currentDate.month === index + 1 
+                                  ? 'bg-[#0095da] text-white' 
+                                  : 'hover:bg-gray-100 text-gray-700'
+                                }
+                              `}
+                            >
+                              {month}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Year Selector */}
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setShowYearSelector(!showYearSelector);
+                      setShowMonthSelector(false);
+                    }}
+                    className="font-bold text-gray-800 hover:text-[#0095da] transition-colors px-2 py-1 rounded-lg hover:bg-blue-50"
+                  >
+                    {formatPersianNumber(currentDate.year)}
+                  </button>
+                  
+                  {showYearSelector && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-10"
+                        onClick={() => setShowYearSelector(false)}
+                      />
+                      <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-20 p-2 w-[250px] max-h-[200px] overflow-y-auto">
+                        <div className="grid grid-cols-4 gap-1">
+                          {availableYears.map((year) => (
+                            <button
+                              key={year}
+                              onClick={() => handleYearSelect(year)}
+                              className={`
+                                px-2 py-1 text-sm rounded-lg transition-all
+                                ${currentDate.year === year 
+                                  ? 'bg-[#0095da] text-white' 
+                                  : 'hover:bg-gray-100 text-gray-700'
+                                }
+                              `}
+                            >
+                              {formatPersianNumber(year)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             
