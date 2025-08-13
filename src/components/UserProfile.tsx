@@ -382,7 +382,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                           {isEditing ? (
                             <PersianDatePicker
                               value={editForm.birthDate}
-                              onChange={(e) => setEditForm(prev => ({ ...prev, birthDate: e.target.value }))}
+                             onChange={(dateString) => setEditForm(prev => ({ ...prev, birthDate: dateString }))}
                               placeholder="تاریخ تولد را انتخاب کنید"
                               className="rounded-xl"
                             />
