@@ -128,7 +128,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
           }}
         >
           {/* Decorative Elements */}
-          <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 opacity-10" style={{ borderRadius: '24px' }}>
             <div className="absolute top-4 right-4 text-4xl">{selectedOccasion.theme.pattern}</div>
             <div className="absolute bottom-4 left-4 text-3xl rotate-12">{selectedOccasion.theme.pattern}</div>
           </div>
