@@ -135,8 +135,8 @@ export function LoginPage({ onLogin, onBackToHome, onLoginSuccess }: LoginPagePr
               <div className="bg-orange-50 border border-orange-200 rounded-xl p-3 text-sm">
                 <div className="font-semibold text-orange-800 mb-1">نکته مهم:</div>
                 <div className="text-orange-700">
-                  برای ورود، ابتدا باید کارت هدیه ایجاد کنید.<br />
-                  سپس با شماره موبایل گیرنده و رمز تولید شده وارد شوید.
+                  برای ورود، ابتدا کارت هدیه ایجاد کنید.<br />
+                  سپس با شماره موبایل گیرنده (هم به عنوان نام کاربری و هم رمز عبور) وارد شوید.
                 </div>
               </div>
 

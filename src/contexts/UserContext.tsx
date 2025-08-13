@@ -18,8 +18,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [loggedInUser, setLoggedInUser] = useLocalStorage<string | null>('loggedInUser', null);
 
   const createUserAccount = (phone: string, giftCard: any) => {
-    const tempPassword = generatePassword();
-    
     const existingUserIndex = userAccounts.findIndex(user => user.phone === phone);
     
     if (existingUserIndex >= 0) {
@@ -33,7 +31,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
         id: Date.now().toString(), // or use a better unique id generator if available
         name: '', // or prompt for name, or set a default
         phone,
-        password: tempPassword,
+        password: phone, // Use phone number as password for testing
         giftCards: [giftCard]
       };
       setUserAccounts(prev => [...prev, newAccount]);
@@ -48,15 +46,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
           : account
       )
     );
-  };
-
-  const generatePassword = () => {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-    let password = '';
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return password;
   };
 
   return (

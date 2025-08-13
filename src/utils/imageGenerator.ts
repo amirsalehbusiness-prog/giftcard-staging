@@ -43,27 +43,16 @@ export async function shareGiftCardImage(
     // Prepare share text
     const finalText = showPrice ? shareText : shareText.replace(/💰 مبلغ:.*?\n/g, '');
     
-    // Generate secure credentials for recipient
-    const generatePassword = () => {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
-      let password = '';
-      for (let i = 0; i < 12; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return password;
-    };
-    
-    const tempPassword = generatePassword();
     const loginUrl = `${window.location.origin}/login`;
     
     const authInfo = recipientPhone ? `
 
 🔐 اطلاعات ورود به حساب کاربری:
 👤 نام کاربری: ${recipientPhone}
-🔑 رمز موقت: ${tempPassword}
+🔑 رمز عبور: ${recipientPhone}
 🌐 لینک ورود: ${loginUrl}
 
-💡 برای امنیت بیشتر، پس از اولین ورود از رمز یکبار مصرف (OTP) استفاده کنید.` : '';
+💡 نکته: در حال حاضر شماره موبایل به عنوان رمز عبور استفاده می‌شود.` : '';
     
     const finalTextWithAuth = finalText + authInfo;
     

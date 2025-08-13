@@ -47,30 +47,16 @@ export function ReviewCard({
 }: ReviewCardProps) {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(isPaid);
-  const [generatedPassword, setGeneratedPassword] = useState<string>("");
 
   // هم‌راستا کردن وضعیت داخلی با prop
   React.useEffect(() => {
     setPaymentCompleted(isPaid);
   }, [isPaid]);
 
-  // ساخت پسورد بعد از تکمیل پرداخت
-  React.useEffect(() => {
-    if (paymentCompleted && !generatedPassword) {
-      const chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-      let password = "";
-      for (let i = 0; i < 12; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      setGeneratedPassword(password);
-    }
-  }, [paymentCompleted, generatedPassword]);
-
   // ⬇️ ذخیره‌ی اعتبار ورود در localStorage (سازگار با ساختار قبلی پروژه)
   const savedRef = React.useRef(false);
   React.useEffect(() => {
-    if (!paymentCompleted || !recipientPhone || !generatedPassword || savedRef.current) return;
+    if (!paymentCompleted || !recipientPhone || savedRef.current) return;
 
     const KEY = "userAccounts";
     type Account = {
@@ -91,8 +77,8 @@ export function ReviewCard({
 
       const next: Account =
         idx >= 0
-          ? { ...list[idx], phone, username: phone, password: generatedPassword }
-          : { phone, username: phone, password: generatedPassword };
+          ? { ...list[idx], phone, username: phone, password: phone }
+          : { phone, username: phone, password: phone };
 
       if (idx >= 0) list[idx] = next;
       else list.push(next);
@@ -107,7 +93,7 @@ export function ReviewCard({
     } catch (e) {
       console.warn("localStorage update error:", e);
     }
-  }, [paymentCompleted, recipientPhone, generatedPassword]);
+  }, [paymentCompleted, recipientPhone]);
 
   const handlePayment = async () => {
     setIsProcessingPayment(true);
@@ -199,7 +185,7 @@ export function ReviewCard({
           </div>
         )}
 
-        {paymentCompleted && recipientPhone && generatedPassword && (
+        {paymentCompleted && recipientPhone && (
           <div className="rounded-2xl border bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-blue-200">
             <div className="text-center mb-3">
               <div className="text-blue-600 font-semibold mb-2">
@@ -216,7 +202,7 @@ export function ReviewCard({
               <div className="flex justify-between items-center bg-white rounded-lg p-2 border">
                 <span className="text-gray-600">رمز عبور:</span>
                 <span className="font-mono font-semibold text-blue-800">
-                  {generatedPassword}
+                  {recipientPhone}
                 </span>
               </div>
             </div>
