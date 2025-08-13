@@ -119,7 +119,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
         background: `linear-gradient(135deg, ${selectedOccasion.theme.primary}05, ${selectedOccasion.theme.secondary}05)`
       }}
     >
-      <CardContent className="p-0">
+      <CardContent className="p-0" style={{ paddingTop: '24px' }}>
         {/* Header */}
         <div 
           className="p-6 relative overflow-hidden"
