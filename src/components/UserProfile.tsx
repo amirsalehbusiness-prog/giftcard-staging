@@ -1,989 +1,719 @@
-import React, { useState, useEffect } from 'react';
-import { Gift, LogOut, Calendar, User, Phone, Clock, Copy, ExternalLink, Shield, CheckCircle, XCircle, ChevronDown, ChevronUp, Heart, Star, Settings, Save, Edit } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { 
+  User, 
+  Gift, 
+  Calendar, 
+  Settings, 
+  LogOut, 
+  Phone, 
+  Mail, 
+  Edit, 
+  Save, 
+  X,
+  Star,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Trash2,
+  Download,
+  Share2,
+  Eye,
+  EyeOff,
+  Filter,
+  Search,
+  Grid,
+  List,
+  MoreVertical
+} from 'lucide-react';
 import { Button } from './ui/button';
+import { Input } from './ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { LoadingSpinner } from './common/LoadingSpinner';
-import { PersianCalendar } from './PersianCalendar';
+import { Switch } from './ui/switch';
+import { Separator } from './ui/separator';
 import { useUser } from '../contexts/UserContext';
-import { PURCHASE_LINKS, OTP_CONFIG } from '../utils/constants';
-import { formatPhoneNumber } from '../utils/validation';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { PersianCalendar } from './PersianCalendar';
+import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
-import type { GiftCard } from '../types';
-import type { SavedDate } from '../types/calendar';
-
-type VoucherState = {
-  isLoading: boolean;
-  showCode: boolean;
-  timeLeft: number;
-};
+import type { SavedDate, GiftCard } from '../types';
 
 type UserProfileProps = {
   onLogout: () => void;
 };
 
+type ViewMode = 'grid' | 'list';
+type FilterType = 'all' | 'active' | 'used' | 'expired';
+
 export function UserProfile({ onLogout }: UserProfileProps) {
-  const { userAccounts, loggedInUser, setLoggedInUser } = useUser();
-  const [activeTab, setActiveTab] = useState<'gifts' | 'calendar' | 'profile'>('gifts');
-  const [expandedCard, setExpandedCard] = useState<string | null>(null);
-  const [voucherStates, setVoucherStates] = useState<Record<string, VoucherState>>({});
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [profileData, setProfileData] = useState({
+  const { userAccounts, loggedInUser, updateUserAccount } = useUser();
+  const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
+  
+  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'settings'>('profile');
+  const [isEditing, setIsEditing] = useState(false);
+  const [showPersonalInfo, setShowPersonalInfo] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [filterType, setFilterType] = useState<FilterType>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Form states for editing
+  const [editForm, setEditForm] = useState({
     firstName: '',
     lastName: '',
-    nationalId: '',
-    phone: loggedInUser || '',
     email: '',
-    birthDate: '',
-    giftPreferences: {
-      category: '',
-      subcategory: ''
-    }
+    nationalId: '',
+    birthDate: ''
   });
-  const [savedDates, setSavedDates] = useState<SavedDate[]>(() => {
-    const saved = localStorage.getItem(`savedDates_${loggedInUser}`);
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const handleLogout = () => {
-    setLoggedInUser(null);
-    onLogout();
-  };
 
   const currentUser = userAccounts.find(user => user.phone === loggedInUser);
 
-  // Gift preference categories and subcategories
-  const giftCategories = {
-    travel: {
-      label: 'سفر',
-      icon: '✈️',
-      subcategories: [
-        { key: 'domestic', label: 'سفرهای داخلی' },
-        { key: 'international', label: 'سفرهای خارجی' },
-        { key: 'adventure', label: 'سفرهای ماجراجویی' },
-        { key: 'cultural', label: 'سفرهای فرهنگی' }
-      ]
-    },
-    movie: {
-      label: 'فیلم',
-      icon: '🎬',
-      subcategories: [
-        { key: 'cinema', label: 'سینما' },
-        { key: 'streaming', label: 'پلتفرم‌های آنلاین' },
-        { key: 'series', label: 'سریال' },
-        { key: 'documentary', label: 'مستند' }
-      ]
-    },
-    music: {
-      label: 'موسیقی',
-      icon: '🎵',
-      subcategories: [
-        { key: 'concert', label: 'کنسرت' },
-        { key: 'streaming', label: 'پلتفرم‌های موسیقی' },
-        { key: 'instrument', label: 'آلات موسیقی' },
-        { key: 'vinyl', label: 'صفحه و کالکشن' }
-      ]
-    },
-    sports: {
-      label: 'ورزش',
-      icon: '⚽',
-      subcategories: [
-        { key: 'gym', label: 'باشگاه و تناسب اندام' },
-        { key: 'equipment', label: 'تجهیزات ورزشی' },
-        { key: 'events', label: 'رویدادهای ورزشی' },
-        { key: 'outdoor', label: 'ورزش‌های طبیعت' }
-      ]
-    }
-  };
-
-  // Load profile data on component mount
-  useEffect(() => {
-    if (currentUser) {
-      setProfileData(prev => ({
-        ...prev,
+  React.useEffect(() => {
+    if (currentUser && isEditing) {
+      setEditForm({
         firstName: currentUser.firstName || '',
         lastName: currentUser.lastName || '',
-        nationalId: currentUser.nationalId || '',
-        phone: currentUser.phone || '',
         email: currentUser.email || '',
-        birthDate: currentUser.birthDate || '',
-        giftPreferences: currentUser.giftPreferences || { category: '', subcategory: '' }
-      }));
+        nationalId: currentUser.nationalId || '',
+        birthDate: currentUser.birthDate || ''
+      });
     }
-  }, [currentUser]);
+  }, [currentUser, isEditing]);
 
   const handleSaveProfile = () => {
-    // Update user account with new profile data
-    // This would typically be an API call
-    console.log('Saving profile:', profileData);
-    setIsEditingProfile(false);
-    // You can add actual save logic here
-  };
-
-  // Save dates to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem(`savedDates_${loggedInUser}`, JSON.stringify(savedDates));
-  }, [savedDates]);
-
-  const handleRequestOTP = async (voucherId: string) => {
-    setVoucherStates(prev => ({
-      ...prev,
-      [voucherId]: { ...prev[voucherId], isLoading: true }
-    }));
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    setVoucherStates(prev => ({
-      ...prev,
-      [voucherId]: { 
-        ...prev[voucherId], 
-        isLoading: false, 
-        timeLeft: OTP_CONFIG.EXPIRY_MINUTES * 60,
-        showCode: true 
-      }
-    }));
-
-    // Start countdown timer
-    const timer = setInterval(() => {
-      setVoucherStates(prev => {
-        const currentState = prev[voucherId];
-        if (!currentState || currentState.timeLeft <= 1) {
-          clearInterval(timer);
-          return {
-            ...prev,
-            [voucherId]: {
-              ...currentState,
-              showCode: false,
-              timeLeft: 0
-            }
-          };
-        }
-        return {
-          ...prev,
-          [voucherId]: {
-            ...currentState,
-            timeLeft: currentState.timeLeft - 1
-          }
-        };
+    if (currentUser) {
+      updateUserAccount(currentUser.phone, {
+        firstName: editForm.firstName,
+        lastName: editForm.lastName,
+        email: editForm.email,
+        nationalId: editForm.nationalId,
+        birthDate: editForm.birthDate,
+        name: `${editForm.firstName} ${editForm.lastName}`.trim()
       });
-    }, 1000);
-  };
-
-  const formatTime = (seconds: number): string => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    // You could add a toast notification here
-  };
-
-  const getTestVoucherCode = (type: string, amount: string): string => {
-    const codes = {
-      internet: {
-        '10': 'INT10GB2024TEST',
-        '20': 'INT20GB2024TEST',
-        '50': 'INT50GB2024TEST',
-        '100': 'INT100GB2024TEST'
-      },
-      voice: {
-        '500': 'VOICE500MIN2024',
-        '1000': 'VOICE1000MIN2024',
-        '2000': 'VOICE2000MIN2024'
-      },
-      digikala: {
-        '500000': 'DK500K2024GIFT',
-        '1000000': 'DK1M2024GIFT',
-        '2000000': 'DK2M2024GIFT',
-        '3000000': 'DK3M2024GIFT'
-      },
-      flytoday: {
-        '1000000': 'FT1M2024TRAVEL',
-        '2000000': 'FT2M2024TRAVEL',
-        '3000000': 'FT3M2024TRAVEL',
-        '5000000': 'FT5M2024TRAVEL'
-      }
-    };
-
-    const typeAmount = amount.replace(/[^\d]/g, '');
-    const codeGroup = codes[type as keyof typeof codes] as Record<string, string> | undefined;
-    return codeGroup?.[typeAmount] || `${type.toUpperCase()}${typeAmount}2024`;
-  };
-
-  const getPurchaseLink = (type: string): string => {
-    switch (type) {
-      case 'internet':
-      case 'voice':
-        return PURCHASE_LINKS.MCI;
-      case 'digikala':
-        return PURCHASE_LINKS.DIGIKALA;
-      case 'flytoday':
-        return PURCHASE_LINKS.FLYTODAY;
-      default:
-        return PURCHASE_LINKS.MCI;
+      setIsEditing(false);
     }
   };
 
-  const getOccasionInfo = (occasionKey: string, customOccasion?: string) => {
-    if (occasionKey === 'custom') {
-      return {
-        label: customOccasion || 'بهانه دلخواه',
-        icon: '✨',
-        gradient: 'from-zinc-700 to-zinc-500'
-      };
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    if (currentUser) {
+      setEditForm({
+        firstName: currentUser.firstName || '',
+        lastName: currentUser.lastName || '',
+        email: currentUser.email || '',
+        nationalId: currentUser.nationalId || '',
+        birthDate: currentUser.birthDate || ''
+      });
     }
-    const occasion = OCCASIONS.find(o => o.key === occasionKey);
-    return {
-      label: occasion?.label || occasionKey,
-      icon: occasion?.theme.pattern || '🎁',
-      gradient: occasion?.gradient || 'from-blue-500 to-purple-500'
-    };
+  };
+
+  // Filter and search gift cards
+  const filteredGiftCards = useMemo(() => {
+    if (!currentUser?.giftCards) return [];
+    
+    let filtered = currentUser.giftCards;
+    
+    // Apply filter
+    switch (filterType) {
+      case 'active':
+        filtered = filtered.filter(card => card.status === 'active');
+        break;
+      case 'used':
+        filtered = filtered.filter(card => card.status === 'used');
+        break;
+      case 'expired':
+        filtered = filtered.filter(card => card.status === 'expired');
+        break;
+    }
+    
+    // Apply search
+    if (searchQuery) {
+      filtered = filtered.filter(card => 
+        card.recipientName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.senderName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        card.occasion?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    return filtered.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  }, [currentUser?.giftCards, filterType, searchQuery]);
+
+  const getOccasionLabel = (occasion: string) => {
+    const found = OCCASIONS.find(o => o.key === occasion);
+    return found ? found.label : occasion;
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'active': return 'bg-green-100 text-green-800 border-green-200';
+      case 'used': return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'expired': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-blue-100 text-blue-800 border-blue-200';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active': return <CheckCircle size={16} />;
+      case 'used': return <Clock size={16} />;
+      case 'expired': return <AlertCircle size={16} />;
+      default: return <Gift size={16} />;
+    }
   };
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">کاربر یافت نشد</h2>
-          <Button onClick={onLogout} variant="outline" className="rounded-xl">
-            بازگشت به صفحه ورود
-          </Button>
+      <div className="text-center py-12">
+        <div className="text-red-600 mb-4">
+          <AlertCircle size={48} className="mx-auto" />
         </div>
+        <h2 className="text-xl font-bold text-gray-800 mb-2">کاربر یافت نشد</h2>
+        <p className="text-gray-600 mb-4">لطفاً دوباره وارد شوید</p>
+        <Button onClick={onLogout} className="rounded-xl">
+          بازگشت به صفحه ورود
+        </Button>
       </div>
     );
   }
 
   return (
-    <div dir="rtl" className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b sticky top-0 z-10">
+      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#0095da] to-[#ff4f00] flex items-center justify-center text-white">
                 <User size={24} />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">پروفایل کاربری</h1>
-                <p className="text-gray-600">{loggedInUser ? formatPhoneNumber(loggedInUser) : ''}</p>
+                <h1 className="text-xl font-bold text-gray-800">
+                  {currentUser.name || `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || 'کاربر'}
+                </h1>
+                <p className="text-sm text-gray-600">{currentUser.phone}</p>
               </div>
             </div>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="rounded-xl flex items-center gap-2"
-            >
-              <LogOut size={18} />
+            <Button onClick={onLogout} variant="outline" className="rounded-xl">
+              <LogOut size={18} className="ml-2" />
               خروج
             </Button>
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 xl:gap-6">
-          {/* Right Sidebar - First in HTML for RTL */}
-          <div className="xl:col-span-1 order-1">
-            <div className="xl:sticky xl:top-24 space-y-4 xl:space-y-6">
-              {/* User Profile Card */}
-              <Card className="rounded-2xl xl:rounded-3xl shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
-                <CardHeader className="text-center pb-3 xl:pb-4 px-4 xl:px-6">
-                  <div className="relative">
-                    <div className="h-16 w-16 xl:h-20 xl:w-20 rounded-2xl xl:rounded-3xl bg-gradient-to-br from-[#0095da] to-[#ff4f00] flex items-center justify-center text-white mx-auto mb-3 xl:mb-4 shadow-xl">
-                      <User size={24} className="xl:hidden" />
-                      <User size={28} className="hidden xl:block" />
-                      <div className="absolute -bottom-1 -right-1 xl:-bottom-2 xl:-right-2 h-5 w-5 xl:h-6 xl:w-6 bg-green-500 rounded-full border-2 xl:border-4 border-white flex items-center justify-center">
-                        <div className="h-1.5 w-1.5 xl:h-2 xl:w-2 bg-white rounded-full"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <CardTitle className="text-base xl:text-lg font-bold text-gray-800 mb-1">
-                    {currentUser.name || 'کاربر گرامی'}
-                  </CardTitle>
-                  <p className="text-gray-500 text-xs xl:text-sm font-medium">
-                    {formatPhoneNumber(loggedInUser || '')}
-                  </p>
-                  <div className="mt-2 xl:mt-3">
-                    <span className="inline-flex items-center px-2 xl:px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <div className="w-1.5 h-1.5 xl:w-2 xl:h-2 bg-green-500 rounded-full mr-1 xl:mr-2"></div>
-                      آنلاین
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-3 xl:px-6 pb-4 xl:pb-6">
-                  <div className="space-y-2 xl:space-y-3">
-                    <div className="flex items-center justify-between p-2.5 xl:p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl xl:rounded-2xl border border-blue-200">
-                      <div className="flex items-center gap-2 xl:gap-3">
-                        <div className="h-7 w-7 xl:h-8 xl:w-8 bg-blue-500 rounded-lg xl:rounded-xl flex items-center justify-center">
-                          <Gift size={14} className="xl:hidden text-white" />
-                          <Gift size={16} className="hidden xl:block text-white" />
-                        </div>
-                        <div>
-                          <span className="text-xs xl:text-sm font-semibold text-gray-800">کارت‌های دریافتی</span>
-                          <div className="text-xs text-gray-600">مجموع هدایا</div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-lg xl:text-xl font-bold text-blue-600">{(currentUser.giftCards ?? []).length}</span>
-                        <div className="text-xs text-blue-500">عدد</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-2.5 xl:p-3 bg-gradient-to-r from-green-50 to-green-100 rounded-xl xl:rounded-2xl border border-green-200">
-                      <div className="flex items-center gap-2 xl:gap-3">
-                        <div className="h-7 w-7 xl:h-8 xl:w-8 bg-green-500 rounded-lg xl:rounded-xl flex items-center justify-center">
-                          <Calendar size={14} className="xl:hidden text-white" />
-                          <Calendar size={16} className="hidden xl:block text-white" />
-                        </div>
-                        <div>
-                          <span className="text-xs xl:text-sm font-semibold text-gray-800">تاریخ‌های ذخیره شده</span>
-                          <div className="text-xs text-gray-600">یادداشت‌ها</div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-lg xl:text-xl font-bold text-green-600">{savedDates.length}</span>
-                        <div className="text-xs text-green-500">مورد</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Navigation Tabs */}
-              <Card className="rounded-2xl xl:rounded-3xl shadow-lg border-0 bg-white">
-                <CardHeader className="pb-2 xl:pb-3 px-4 xl:px-6">
-                  <CardTitle className="text-sm xl:text-base font-bold text-gray-800 flex items-center gap-2">
-                    <div className="h-2 w-2 bg-[#0095da] rounded-full"></div>
-                    منوی اصلی
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-0 px-3 xl:px-6 pb-4 xl:pb-6">
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => setActiveTab('gifts')}
-                      className={`w-full flex items-center gap-2 xl:gap-3 py-2.5 xl:py-3 px-2.5 xl:px-3 rounded-xl xl:rounded-2xl transition-all duration-200 ${
-                        activeTab === 'gifts'
-                          ? 'bg-gradient-to-r from-[#0095da] to-[#0085ca] text-white shadow-lg transform scale-[1.02]'
-                          : 'text-gray-600 hover:bg-gray-50 hover:scale-[1.01]'
-                      }`}
-                    >
-                      <div className={`h-8 w-8 xl:h-10 xl:w-10 rounded-lg xl:rounded-xl flex items-center justify-center ${
-                        activeTab === 'gifts' ? 'bg-white/20' : 'bg-blue-100'
-                      }`}>
-                        <Gift size={16} className={`xl:hidden ${activeTab === 'gifts' ? 'text-white' : 'text-blue-600'}`} />
-                        <Gift size={18} className={`hidden xl:block ${activeTab === 'gifts' ? 'text-white' : 'text-blue-600'}`} />
-                      </div>
-                      <div className="flex-1 text-right">
-                        <div className={`text-xs xl:text-sm font-semibold ${activeTab === 'gifts' ? 'text-white' : 'text-gray-800'}`}>
-                          کارت‌های هدیه
-                        </div>
-                        <div className={`text-xs ${activeTab === 'gifts' ? 'text-white/80' : 'text-gray-500'}`}>
-                          مدیریت هدایا
-                        </div>
-                      </div>
-                      <Badge className={`rounded-full text-xs font-bold min-w-[20px] h-5 xl:h-6 ${
-                        activeTab === 'gifts' 
-                          ? 'bg-white/20 text-white border border-white/30' 
-                          : 'bg-blue-100 text-blue-600 border border-blue-200'
-                      }`}>
-                        {(currentUser.giftCards ?? []).length}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Sidebar Navigation */}
+          <div className="lg:col-span-1">
+            <Card className="rounded-2xl sticky top-24">
+              <CardContent className="p-4">
+                <nav className="space-y-2">
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      activeTab === 'profile' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <User size={20} />
+                    <span>پروفایل</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('giftCards')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      activeTab === 'giftCards' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Gift size={20} />
+                    <span>کارت‌های هدیه</span>
+                    {currentUser.giftCards?.length > 0 && (
+                      <Badge className="rounded-full bg-orange-100 text-orange-800 text-xs">
+                        {currentUser.giftCards.length}
                       </Badge>
-                    </button>
-                    
-                    <button
-                      onClick={() => setActiveTab('calendar')}
-                      className={`w-full flex items-center gap-2 xl:gap-3 py-2.5 xl:py-3 px-2.5 xl:px-3 rounded-xl xl:rounded-2xl transition-all duration-200 ${
-                        activeTab === 'calendar'
-                          ? 'bg-gradient-to-r from-[#0095da] to-[#0085ca] text-white shadow-lg transform scale-[1.02]'
-                          : 'text-gray-600 hover:bg-gray-50 hover:scale-[1.01]'
-                      }`}
-                    >
-                      <div className={`h-8 w-8 xl:h-10 xl:w-10 rounded-lg xl:rounded-xl flex items-center justify-center ${
-                        activeTab === 'calendar' ? 'bg-white/20' : 'bg-green-100'
-                      }`}>
-                        <Calendar size={16} className={`xl:hidden ${activeTab === 'calendar' ? 'text-white' : 'text-green-600'}`} />
-                        <Calendar size={18} className={`hidden xl:block ${activeTab === 'calendar' ? 'text-white' : 'text-green-600'}`} />
-                      </div>
-                      <div className="flex-1 text-right">
-                        <div className={`text-xs xl:text-sm font-semibold ${activeTab === 'calendar' ? 'text-white' : 'text-gray-800'}`}>
-                          تقویم
-                        </div>
-                        <div className={`text-xs ${activeTab === 'calendar' ? 'text-white/80' : 'text-gray-500'}`}>
-                          یادداشت‌ها
-                        </div>
-                      </div>
-                      <Badge className={`rounded-full text-xs font-bold min-w-[20px] h-5 xl:h-6 ${
-                        activeTab === 'calendar' 
-                          ? 'bg-white/20 text-white border border-white/30' 
-                          : 'bg-green-100 text-green-600 border border-green-200'
-                      }`}>
-                        {savedDates.length}
-                      </Badge>
-                    </button>
-
-                    <button
-                      onClick={() => setActiveTab('profile')}
-                      className={`w-full flex items-center gap-2 xl:gap-3 py-2.5 xl:py-3 px-2.5 xl:px-3 rounded-xl xl:rounded-2xl transition-all duration-200 ${
-                        activeTab === 'profile'
-                          ? 'bg-gradient-to-r from-[#0095da] to-[#0085ca] text-white shadow-lg transform scale-[1.02]'
-                          : 'text-gray-600 hover:bg-gray-50 hover:scale-[1.01]'
-                      }`}
-                    >
-                      <div className={`h-8 w-8 xl:h-10 xl:w-10 rounded-lg xl:rounded-xl flex items-center justify-center ${
-                        activeTab === 'profile' ? 'bg-white/20' : 'bg-purple-100'
-                      }`}>
-                        <Settings size={16} className={`xl:hidden ${activeTab === 'profile' ? 'text-white' : 'text-purple-600'}`} />
-                        <Settings size={18} className={`hidden xl:block ${activeTab === 'profile' ? 'text-white' : 'text-purple-600'}`} />
-                      </div>
-                      <div className="flex-1 text-right">
-                        <div className={`text-xs xl:text-sm font-semibold ${activeTab === 'profile' ? 'text-white' : 'text-gray-800'}`}>
-                          مشخصات
-                        </div>
-                        <div className={`text-xs ${activeTab === 'profile' ? 'text-white/80' : 'text-gray-500'}`}>
-                          ویرایش پروفایل
-                        </div>
-                      </div>
-                      <Badge className={`rounded-full text-xs font-bold min-w-[20px] h-5 xl:h-6 ${
-                        activeTab === 'profile' 
-                          ? 'bg-white/20 text-white border border-white/30' 
-                          : 'bg-purple-100 text-purple-600 border border-purple-200'
-                      }`}>
-                        <Edit size={12} />
-                      </Badge>
-                    </button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Stats */}
-              <Card className="rounded-2xl xl:rounded-3xl shadow-lg border-0 bg-gradient-to-br from-white to-purple-50">
-                <CardHeader className="px-4 xl:px-6 pb-3 xl:pb-4">
-                  <CardTitle className="text-sm xl:text-base font-bold text-gray-800 flex items-center gap-2 xl:gap-3">
-                    <div className="h-7 w-7 xl:h-8 xl:w-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg xl:rounded-xl flex items-center justify-center">
-                      <Star size={14} className="xl:hidden text-white" />
-                      <Star size={16} className="hidden xl:block text-white" />
-                    </div>
-                    <div>
-                      <div className="text-xs xl:text-sm">آمار سریع</div>
-                      <div className="text-xs font-normal text-gray-500">خلاصه فعالیت‌ها</div>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="px-4 xl:px-6 pb-4 xl:pb-6">
-                  <div className="space-y-2 xl:space-y-3">
-                    <div className="flex items-center justify-between p-2.5 xl:p-3 bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl xl:rounded-2xl border border-emerald-200">
-                      <div className="flex items-center gap-2 xl:gap-3">
-                        <div className="h-6 w-6 xl:h-7 xl:w-7 bg-emerald-500 rounded-lg flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">💰</span>
-                        </div>
-                        <div>
-                          <span className="text-xs xl:text-sm font-semibold text-gray-800">کل ارزش دریافتی</span>
-                          <div className="text-xs text-gray-600">مجموع هدایا</div>
-                        </div>
-                      </div>
-                      <div className="text-left">
-                        <span className="text-sm xl:text-base font-bold text-emerald-600">
-                          {(currentUser.giftCards ?? [])
-                            .reduce((sum: number, gift: any) => sum + (gift.totalValue || gift.totalPrice || 0), 0)
-                            .toLocaleString('fa-IR')}
-                        </span>
-                        <div className="text-xs text-emerald-500">تومان</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-2.5 xl:p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl xl:rounded-2xl border border-blue-200">
-                      <div className="flex items-center gap-2 xl:gap-3">
-                        <div className="h-6 w-6 xl:h-7 xl:w-7 bg-blue-500 rounded-lg flex items-center justify-center">
-                          <CheckCircle size={12} className="xl:hidden text-white" />
-                          <CheckCircle size={14} className="hidden xl:block text-white" />
-                        </div>
-                        <div>
-                          <span className="text-xs xl:text-sm font-semibold text-gray-800">کارت‌های فعال</span>
-                          <div className="text-xs text-gray-600">قابل استفاده</div>
-                        </div>
-                      </div>
-                      <div className="text-center">
-                        <span className="text-sm xl:text-base font-bold text-blue-600">
-                          {(currentUser.giftCards ?? []).filter((gift: any) => gift.status !== 'used').length}
-                        </span>
-                        <div className="text-xs text-blue-500">عدد</div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Action Buttons */}
-              <Card className="rounded-2xl xl:rounded-3xl shadow-lg border-0 bg-gradient-to-br from-white to-orange-50">
-                <CardContent className="p-3 xl:p-4">
-                  <div className="space-y-3">
-                    <Button
-                      onClick={handleLogout}
-                      variant="outline"
-                      className="w-full rounded-xl xl:rounded-2xl border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 transition-all duration-200 py-2 xl:py-2.5 text-xs xl:text-sm"
-                    >
-                      <LogOut size={14} className="xl:hidden ml-2" />
-                      <LogOut size={16} className="hidden xl:block ml-2" />
-                      خروج از حساب
-                    </Button>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500 mb-2">نسخه برنامه</div>
-                      <Badge variant="outline" className="rounded-full text-xs">
-                        v1.0.0 - نمایشی
-                      </Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                    )}
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('calendar')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      activeTab === 'calendar' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Calendar size={20} />
+                    <span>تقویم</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('settings')}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                      activeTab === 'settings' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Settings size={20} />
+                    <span>تنظیمات</span>
+                  </button>
+                </nav>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Main Content */}
-          <div className="xl:col-span-3 order-2">
-            {activeTab === 'gifts' && (
-              <div className="space-y-4">
-                <h2 className="text-xl xl:text-2xl font-bold text-gray-800 mb-4 xl:mb-6">کارت‌های هدیه دریافتی</h2>
-                
-                {(currentUser.giftCards ?? []).length === 0 ? (
-                  <Card className="rounded-xl xl:rounded-2xl">
-                    <CardContent className="text-center py-8 xl:py-12">
-                      <Gift size={48} className="xl:hidden mx-auto mb-4 text-gray-300" />
-                      <Gift size={64} className="hidden xl:block mx-auto mb-4 text-gray-300" />
-                      <h3 className="text-base xl:text-lg font-semibold text-gray-600 mb-2">هنوز کارت هدیه‌ای دریافت نکرده‌اید</h3>
-                      <p className="text-sm xl:text-base text-gray-500">کارت‌های هدیه دریافتی شما در اینجا نمایش داده می‌شود</p>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  (currentUser.giftCards ?? []).map((gift: any) => {
-                    const safeGift = {
-                      ...gift,
-                      vouchers: Array.isArray(gift.vouchers) ? gift.vouchers : [],
-                      totalValue: gift.totalValue || gift.totalPrice || 0,
-                      status: gift.status || 'active',
-                      receivedDate: gift.receivedDate || gift.createdAt || new Date().toLocaleDateString('fa-IR'),
-                      message: gift.message || 'پیام تبریک'
-                    };
-                    
-                    const occasionInfo = getOccasionInfo(gift.occasion, gift.customOccasion);
-                    const isExpanded = expandedCard === gift.id;
-                    
-                    return (
-                      <Card key={gift.id} className="rounded-xl xl:rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200">
-                        {/* Card Header - Always Visible */}
-                        <div 
-                          className={`bg-gradient-to-r ${occasionInfo.gradient} p-4 xl:p-6 text-white cursor-pointer`}
-                          onClick={() => setExpandedCard(isExpanded ? null : gift.id)}
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3 xl:gap-4">
-                              <div className="text-2xl xl:text-4xl">{occasionInfo.icon}</div>
-                              <div>
-                                <h3 className="text-base xl:text-xl font-bold mb-1">{occasionInfo.label}</h3>
-                                <div className="flex items-center gap-2 xl:gap-4 text-white/90 text-xs xl:text-sm">
-                                  <span>از طرف: {gift.senderName || 'نامشخص'}</span>
-                                  <span>•</span>
-                                  <span>{safeGift.receivedDate}</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <div className="text-center">
-                                <div className="text-lg xl:text-2xl font-bold">{safeGift.totalValue.toLocaleString('fa-IR')}</div>
-                                <div className="text-xs text-white/80">تومان</div>
-                              </div>
-                              <div className="text-white/70">
-                                {isExpanded ? <ChevronUp size={24} /> : <ChevronDown size={24} />}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Expandable Content */}
-                        {isExpanded && (
-                          <CardContent className="p-4 xl:p-6">
-                            {/* Greeting Message */}
-                            <div className="mb-4 xl:mb-6">
-                              <h4 className="text-sm xl:text-base font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                                <Heart size={18} className="text-red-500" />
-                                پیام تبریک
-                              </h4>
-                              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg xl:rounded-xl p-3 xl:p-4 border border-blue-100">
-                                <p className="text-sm xl:text-base text-gray-700 leading-relaxed">
-                                  {gift.message || safeGift.message || 'پیام تبریک ارسال شده است'}
-                                </p>
-                              </div>
-                            </div>
-
-                            {/* Vouchers Grid */}
-                            <div>
-                              <h4 className="text-sm xl:text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                                <Gift size={18} className="text-green-500" />
-                                محتویات هدیه ({safeGift.vouchers.length} مورد)
-                              </h4>
-                              
-                              {safeGift.vouchers.length === 0 ? (
-                                <div className="text-center py-6 xl:py-8 text-gray-500">
-                                  <p className="text-sm xl:text-base">این کارت هدیه شامل بسته‌ای نمی‌باشد</p>
-                                </div>
-                              ) : (
-                                <div className="grid gap-3 xl:gap-4 xl:grid-cols-2">
-                                  {safeGift.vouchers.map((voucher: any) => (
-                                    <div key={voucher.id} className="border rounded-lg xl:rounded-xl p-3 xl:p-4 bg-white hover:shadow-md transition-shadow">
-                                      <div className="flex items-center gap-3 mb-3">
-                                        <div className={`h-10 w-10 xl:h-12 xl:w-12 rounded-lg xl:rounded-xl flex items-center justify-center text-xl xl:text-2xl ${
-                                          voucher.type === 'internet' ? 'bg-blue-100' :
-                                          voucher.type === 'voice' ? 'bg-green-100' :
-                                          voucher.type === 'digikala' ? 'bg-red-100' :
-                                          'bg-purple-100'
-                                        }`}>
-                                          {voucher.type === 'internet' ? '📶' :
-                                           voucher.type === 'voice' ? '📞' :
-                                           voucher.type === 'digikala' ? '🛒' : '✈️'}
-                                        </div>
-                                        <div className="flex-1">
-                                          <div className="text-sm xl:text-base font-semibold text-gray-800">
-                                            {voucher.type === 'internet' ? 'بسته اینترنت' :
-                                             voucher.type === 'voice' ? 'بسته مکالمه' :
-                                             voucher.type === 'digikala' ? 'ووچر دیجی‌کالا' :
-                                             'ووچر فلای‌تودی'}
-                                          </div>
-                                          <div className="text-sm text-gray-600">{voucher.amount}</div>
-                                        </div>
-                                        <Badge className={`rounded-lg xl:rounded-xl text-xs ${
-                                          voucher.used ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
-                                        }`}>
-                                          {voucher.used ? (
-                                            <>
-                                              <XCircle size={12} className="ml-1" />
-                                              استفاده شده
-                                            </>
-                                          ) : (
-                                            <>
-                                              <CheckCircle size={12} className="ml-1" />
-                                              قابل استفاده
-                                            </>
-                                          )}
-                                        </Badge>
-                                      </div>
-
-                                      {/* Voucher Code Section */}
-                                      {voucherStates[voucher.id]?.showCode ? (
-                                        <div className="space-y-3">
-                                          <div className="bg-gray-50 rounded-lg p-2.5 xl:p-3 border-2 border-dashed border-gray-300">
-                                            <div className="text-xs text-gray-500 mb-1">کد ووچر:</div>
-                                            <div className="font-mono text-xs xl:text-sm font-bold text-blue-600">
-                                              {getTestVoucherCode(voucher.type, voucher.amount)}
-                                            </div>
-                                          </div>
-                                          
-                                          <div className="flex gap-2">
-                                            <Button
-                                              onClick={() => copyToClipboard(getTestVoucherCode(voucher.type, voucher.amount))}
-                                              className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700"
-                                            >
-                                              <Copy size={14} className="ml-1" />
-                                              کپی کد
-                                            </Button>
-                                            <Button
-                                              variant="outline"
-                                              onClick={() => window.open(getPurchaseLink(voucher.type), '_blank')}
-                                              className="rounded-xl"
-                                            >
-                                              <ExternalLink size={14} />
-                                            </Button>
-                                          </div>
-                                          
-                                          <div className="text-xs text-orange-600 text-center flex items-center justify-center gap-1">
-                                            <Clock size={12} />
-                                            {formatTime(voucherStates[voucher.id]?.timeLeft || 0)} باقی‌مانده
-                                          </div>
-                                        </div>
-                                      ) : (
-                                        <div className="space-y-2">
-                                          <Button
-                                            onClick={() => handleRequestOTP(voucher.id)}
-                                            className="w-full rounded-lg xl:rounded-xl bg-blue-600 hover:bg-blue-700 text-xs xl:text-sm py-2"
-                                            disabled={voucher.used || voucherStates[voucher.id]?.isLoading}
-                                          >
-                                            {voucherStates[voucher.id]?.isLoading ? (
-                                              <LoadingSpinner size="sm" color="text-white" className="ml-1" />
-                                            ) : (
-                                              <Shield size={16} className="ml-1" />
-                                            )}
-                                            {voucher.used ? 'استفاده شده' : 
-                                             voucherStates[voucher.id]?.isLoading ? 'در حال ارسال...' : 'دریافت کد'}
-                                          </Button>
-                                          
-                                          <Button
-                                            variant="outline"
-                                            onClick={() => window.open(getPurchaseLink(voucher.type), '_blank')}
-                                            className="w-full rounded-lg xl:rounded-xl text-xs xl:text-sm py-2"
-                                          >
-                                            <ExternalLink size={14} className="ml-1" />
-                                            {voucher.type === 'internet' ? 'خرید بسته اینترنت' :
-                                             voucher.type === 'voice' ? 'خرید بسته مکالمه' :
-                                             voucher.type === 'digikala' ? 'خرید از دیجی‌کالا' :
-                                             'رزرو سفر'}
-                                          </Button>
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          </CardContent>
-                        )}
-                      </Card>
-                    );
-                  })
-                )}
-              </div>
-            )}
-
+          <div className="lg:col-span-3">
+            {/* Profile Tab */}
             {activeTab === 'profile' && (
-              <div className="space-y-4 xl:space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl xl:text-2xl font-bold text-gray-800">مشخصات کاربری</h2>
-                  <Button
-                    onClick={() => setIsEditingProfile(!isEditingProfile)}
-                    variant={isEditingProfile ? "solid" : "outline"}
-                    className="rounded-xl"
-                  >
-                    {isEditingProfile ? (
-                      <>
-                        <Save size={16} className="ml-2" />
-                        ذخیره تغییرات
-                      </>
-                    ) : (
-                      <>
-                        <Edit size={16} className="ml-2" />
-                        ویرایش
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                <div className="grid gap-4 xl:gap-6">
-                  {/* Personal Information */}
-                  <Card className="rounded-xl xl:rounded-2xl">
-                    <CardHeader>
+              <div className="space-y-6">
+                {/* Profile Overview */}
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
                       <CardTitle className="flex items-center gap-2">
-                        <User size={20} className="text-blue-600" />
+                        <User size={20} />
                         اطلاعات شخصی
                       </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">نمایش اطلاعات:</span>
+                          <Switch
+                            checked={showPersonalInfo}
+                            onCheckedChange={setShowPersonalInfo}
+                          />
+                          {showPersonalInfo ? <Eye size={16} /> : <EyeOff size={16} />}
+                        </div>
+                        <Button
+                          onClick={() => setIsEditing(!isEditing)}
+                          variant={isEditing ? "outline" : "solid"}
+                          className="rounded-xl"
+                        >
+                          {isEditing ? <X size={18} /> : <Edit size={18} />}
+                          {isEditing ? 'انصراف' : 'ویرایش'}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {showPersonalInfo ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">نام</label>
-                          {isEditingProfile ? (
+                          {isEditing ? (
                             <Input
-                              value={profileData.firstName}
-                              onChange={(e) => setProfileData(prev => ({ ...prev, firstName: e.target.value }))}
+                              value={editForm.firstName}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, firstName: e.target.value }))}
                               placeholder="نام خود را وارد کنید"
                               className="rounded-xl"
                             />
                           ) : (
-                            <div className="p-3 bg-gray-50 rounded-xl text-gray-800">
-                              {profileData.firstName || 'وارد نشده'}
+                            <div className="p-3 bg-gray-50 rounded-xl">
+                              {currentUser.firstName || 'وارد نشده'}
                             </div>
                           )}
                         </div>
+
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">نام خانوادگی</label>
-                          {isEditingProfile ? (
+                          {isEditing ? (
                             <Input
-                              value={profileData.lastName}
-                              onChange={(e) => setProfileData(prev => ({ ...prev, lastName: e.target.value }))}
+                              value={editForm.lastName}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, lastName: e.target.value }))}
                               placeholder="نام خانوادگی خود را وارد کنید"
                               className="rounded-xl"
                             />
                           ) : (
-                            <div className="p-3 bg-gray-50 rounded-xl text-gray-800">
-                              {profileData.lastName || 'وارد نشده'}
+                            <div className="p-3 bg-gray-50 rounded-xl">
+                              {currentUser.lastName || 'وارد نشده'}
                             </div>
                           )}
                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">شماره ملی</label>
-                          {isEditingProfile ? (
-                            <Input
-                              value={profileData.nationalId}
-                              onChange={(e) => setProfileData(prev => ({ ...prev, nationalId: e.target.value }))}
-                              placeholder="شماره ملی خود را وارد کنید"
-                              className="rounded-xl"
-                              maxLength={10}
-                            />
-                          ) : (
-                            <div className="p-3 bg-gray-50 rounded-xl text-gray-800">
-                              {profileData.nationalId || 'وارد نشده'}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">شماره تلفن موبایل</label>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">شماره موبایل</label>
                           <div className="p-3 bg-gray-100 rounded-xl text-gray-600">
-                            {formatPhoneNumber(profileData.phone)} (غیرقابل تغییر)
+                            <Phone size={16} className="inline ml-2" />
+                            {currentUser.phone}
                           </div>
                         </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">ایمیل</label>
-                          {isEditingProfile ? (
+                          {isEditing ? (
                             <Input
                               type="email"
-                              value={profileData.email}
-                              onChange={(e) => setProfileData(prev => ({ ...prev, email: e.target.value }))}
+                              value={editForm.email}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
                               placeholder="ایمیل خود را وارد کنید"
                               className="rounded-xl"
                             />
                           ) : (
-                            <div className="p-3 bg-gray-50 rounded-xl text-gray-800">
-                              {profileData.email || 'وارد نشده'}
+                            <div className="p-3 bg-gray-50 rounded-xl">
+                              <Mail size={16} className="inline ml-2" />
+                              {currentUser.email || 'وارد نشده'}
                             </div>
                           )}
                         </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">کد ملی</label>
+                          {isEditing ? (
+                            <Input
+                              value={editForm.nationalId}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, nationalId: e.target.value }))}
+                              placeholder="کد ملی خود را وارد کنید"
+                              className="rounded-xl"
+                              maxLength={10}
+                            />
+                          ) : (
+                            <div className="p-3 bg-gray-50 rounded-xl">
+                              {currentUser.nationalId || 'وارد نشده'}
+                            </div>
+                          )}
+                        </div>
+
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-2">تاریخ تولد</label>
-                          {isEditingProfile ? (
+                          {isEditing ? (
                             <Input
                               type="date"
-                              value={profileData.birthDate}
-                              onChange={(e) => setProfileData(prev => ({ ...prev, birthDate: e.target.value }))}
+                              value={editForm.birthDate}
+                              onChange={(e) => setEditForm(prev => ({ ...prev, birthDate: e.target.value }))}
                               className="rounded-xl"
                             />
                           ) : (
-                            <div className="p-3 bg-gray-50 rounded-xl text-gray-800">
-                              {profileData.birthDate ? new Date(profileData.birthDate).toLocaleDateString('fa-IR') : 'وارد نشده'}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Gift Preferences */}
-                  <Card className="rounded-xl xl:rounded-2xl">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Heart size={20} className="text-pink-600" />
-                        کادو چی دوست دارم
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-3">دسته‌بندی علاقه‌مندی</label>
-                        {isEditingProfile ? (
-                          <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
-                            {Object.entries(giftCategories).map(([key, category]) => (
-                              <button
-                                key={key}
-                                onClick={() => setProfileData(prev => ({
-                                  ...prev,
-                                  giftPreferences: { ...prev.giftPreferences, category: key, subcategory: '' }
-                                }))}
-                                className={`p-3 rounded-xl border-2 transition-all ${
-                                  profileData.giftPreferences.category === key
-                                    ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                    : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                              >
-                                <div className="text-2xl mb-2">{category.icon}</div>
-                                <div className="text-sm font-medium">{category.label}</div>
-                              </button>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="p-3 bg-gray-50 rounded-xl">
-                            {profileData.giftPreferences.category ? (
-                              <div className="flex items-center gap-2">
-                                <span className="text-2xl">
-                                  {giftCategories[profileData.giftPreferences.category as keyof typeof giftCategories]?.icon}
-                                </span>
-                                <span className="font-medium">
-                                  {giftCategories[profileData.giftPreferences.category as keyof typeof giftCategories]?.label}
-                                </span>
-                              </div>
-                            ) : (
-                              <span className="text-gray-500">انتخاب نشده</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      {profileData.giftPreferences.category && (
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-3">زیردسته</label>
-                          {isEditingProfile ? (
-                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-2">
-                              {giftCategories[profileData.giftPreferences.category as keyof typeof giftCategories]?.subcategories.map((sub) => (
-                                <button
-                                  key={sub.key}
-                                  onClick={() => setProfileData(prev => ({
-                                    ...prev,
-                                    giftPreferences: { ...prev.giftPreferences, subcategory: sub.key }
-                                  }))}
-                                  className={`p-2 rounded-lg border text-sm transition-all ${
-                                    profileData.giftPreferences.subcategory === sub.key
-                                      ? 'border-blue-500 bg-blue-50 text-blue-700'
-                                      : 'border-gray-200 hover:border-gray-300'
-                                  }`}
-                                >
-                                  {sub.label}
-                                </button>
-                              ))}
-                            </div>
-                          ) : (
                             <div className="p-3 bg-gray-50 rounded-xl">
-                              {profileData.giftPreferences.subcategory ? (
-                                giftCategories[profileData.giftPreferences.category as keyof typeof giftCategories]?.subcategories
-                                  .find(sub => sub.key === profileData.giftPreferences.subcategory)?.label
-                              ) : (
-                                <span className="text-gray-500">انتخاب نشده</span>
-                              )}
+                              {currentUser.birthDate ? new Date(currentUser.birthDate).toLocaleDateString('fa-IR') : 'وارد نشده'}
                             </div>
                           )}
                         </div>
-                      )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <EyeOff size={48} className="mx-auto mb-4 opacity-50" />
+                        <p>اطلاعات شخصی مخفی شده است</p>
+                        <p className="text-sm">برای نمایش، گزینه "نمایش اطلاعات" را فعال کنید</p>
+                      </div>
+                    )}
+
+                    {isEditing && showPersonalInfo && (
+                      <div className="flex gap-3 mt-6 pt-6 border-t">
+                        <Button onClick={handleSaveProfile} className="rounded-xl">
+                          <Save size={18} className="ml-2" />
+                          ذخیره تغییرات
+                        </Button>
+                        <Button onClick={handleCancelEdit} variant="outline" className="rounded-xl">
+                          انصراف
+                        </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Quick Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <Card className="rounded-2xl">
+                    <CardContent className="p-6 text-center">
+                      <div className="h-12 w-12 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-600 mx-auto mb-3">
+                        <Gift size={24} />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-800">
+                        {currentUser.giftCards?.length || 0}
+                      </div>
+                      <div className="text-sm text-gray-600">کارت هدیه دریافتی</div>
                     </CardContent>
                   </Card>
 
-                  {isEditingProfile && (
-                    <div className="flex gap-3">
-                      <Button
-                        onClick={handleSaveProfile}
-                        className="flex-1 rounded-xl bg-green-600 hover:bg-green-700"
-                      >
-                        <Save size={16} className="ml-2" />
-                        ذخیره تغییرات
-                      </Button>
-                      <Button
-                        onClick={() => setIsEditingProfile(false)}
-                        variant="outline"
-                        className="flex-1 rounded-xl"
-                      >
-                        انصراف
-                      </Button>
-                    </div>
-                  )}
+                  <Card className="rounded-2xl">
+                    <CardContent className="p-6 text-center">
+                      <div className="h-12 w-12 rounded-2xl bg-green-100 flex items-center justify-center text-green-600 mx-auto mb-3">
+                        <CheckCircle size={24} />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-800">
+                        {currentUser.giftCards?.filter(card => card.status === 'active').length || 0}
+                      </div>
+                      <div className="text-sm text-gray-600">کارت فعال</div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="rounded-2xl">
+                    <CardContent className="p-6 text-center">
+                      <div className="h-12 w-12 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 mx-auto mb-3">
+                        <Star size={24} />
+                      </div>
+                      <div className="text-2xl font-bold text-gray-800">
+                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.totalValue || 0), 0) || 0)}
+                      </div>
+                      <div className="text-sm text-gray-600">کل ارزش دریافتی (تومان)</div>
+                    </CardContent>
+                  </Card>
                 </div>
               </div>
             )}
 
+            {/* Gift Cards Tab */}
+            {activeTab === 'giftCards' && (
+              <div className="space-y-6">
+                {/* Filters and Search */}
+                <Card className="rounded-2xl">
+                  <CardContent className="p-4">
+                    <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
+                      <div className="flex items-center gap-4 w-full lg:w-auto">
+                        <div className="relative flex-1 lg:w-80">
+                          <Search size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                          <Input
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="جستجو در کارت‌های هدیه..."
+                            className="rounded-xl pr-10"
+                          />
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          <Filter size={18} className="text-gray-600" />
+                          <select
+                            value={filterType}
+                            onChange={(e) => setFilterType(e.target.value as FilterType)}
+                            className="border border-gray-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0095da]"
+                          >
+                            <option value="all">همه</option>
+                            <option value="active">فعال</option>
+                            <option value="used">استفاده شده</option>
+                            <option value="expired">منقضی</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Button
+                          onClick={() => setViewMode('grid')}
+                          variant={viewMode === 'grid' ? 'solid' : 'outline'}
+                          className="rounded-xl p-2"
+                        >
+                          <Grid size={18} />
+                        </Button>
+                        <Button
+                          onClick={() => setViewMode('list')}
+                          variant={viewMode === 'list' ? 'solid' : 'outline'}
+                          className="rounded-xl p-2"
+                        >
+                          <List size={18} />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Gift Cards Display */}
+                {filteredGiftCards.length === 0 ? (
+                  <Card className="rounded-2xl">
+                    <CardContent className="p-12 text-center">
+                      <Gift size={64} className="mx-auto mb-4 text-gray-300" />
+                      <h3 className="text-xl font-bold text-gray-800 mb-2">
+                        {searchQuery || filterType !== 'all' ? 'نتیجه‌ای یافت نشد' : 'هنوز کارت هدیه‌ای دریافت نکرده‌اید'}
+                      </h3>
+                      <p className="text-gray-600">
+                        {searchQuery || filterType !== 'all' 
+                          ? 'فیلترها یا جستجو را تغییر دهید'
+                          : 'کارت‌های هدیه دریافتی شما در اینجا نمایش داده می‌شود'
+                        }
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6' : 'space-y-4'}>
+                    {filteredGiftCards.map((giftCard) => (
+                      <Card key={giftCard.id} className="rounded-2xl hover:shadow-lg transition-all">
+                        <CardContent className={viewMode === 'grid' ? 'p-6' : 'p-4'}>
+                          {viewMode === 'grid' ? (
+                            // Grid View
+                            <div className="space-y-4">
+                              <div className="flex items-center justify-between">
+                                <Badge className={`rounded-xl ${getStatusColor(giftCard.status || 'active')}`}>
+                                  {getStatusIcon(giftCard.status || 'active')}
+                                  <span className="mr-1">
+                                    {giftCard.status === 'active' ? 'فعال' :
+                                     giftCard.status === 'used' ? 'استفاده شده' :
+                                     giftCard.status === 'expired' ? 'منقضی' : 'نامشخص'}
+                                  </span>
+                                </Badge>
+                                <Button variant="ghost" className="rounded-xl p-2">
+                                  <MoreVertical size={16} />
+                                </Button>
+                              </div>
+
+                              <div>
+                                <h3 className="font-bold text-gray-800 mb-1">
+                                  {getOccasionLabel(giftCard.occasion || '')}
+                                </h3>
+                                <p className="text-sm text-gray-600">
+                                  از طرف: {giftCard.senderName || 'نامشخص'}
+                                </p>
+                              </div>
+
+                              <div className="bg-gray-50 rounded-xl p-3">
+                                <div className="text-sm text-gray-600 mb-1">محتویات هدیه:</div>
+                                <div className="space-y-1">
+                                  {giftCard.vouchers?.map((voucher, index) => (
+                                    <div key={index} className="flex items-center justify-between text-xs">
+                                      <span>{voucher.type}: {voucher.amount}</span>
+                                      <Badge variant={voucher.used ? 'secondary' : 'solid'} className="text-xs">
+                                        {voucher.used ? 'استفاده شده' : 'فعال'}
+                                      </Badge>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {giftCard.totalValue && (
+                                <div className="text-center p-3 bg-gradient-to-r from-blue-50 to-orange-50 rounded-xl">
+                                  <div className="text-lg font-bold text-gray-800">
+                                    {formatPrice(giftCard.totalValue)} تومان
+                                  </div>
+                                  <div className="text-xs text-gray-600">ارزش کل</div>
+                                </div>
+                              )}
+
+                              <div className="flex gap-2">
+                                <Button variant="outline" className="flex-1 rounded-xl text-xs">
+                                  <Eye size={14} className="ml-1" />
+                                  مشاهده
+                                </Button>
+                                <Button variant="outline" className="flex-1 rounded-xl text-xs">
+                                  <Share2 size={14} className="ml-1" />
+                                  اشتراک
+                                </Button>
+                              </div>
+
+                              <div className="text-xs text-gray-500 text-center">
+                                دریافت شده: {giftCard.receivedDate || 'نامشخص'}
+                              </div>
+                            </div>
+                          ) : (
+                            // List View
+                            <div className="flex items-center gap-4">
+                              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-[#0095da] to-[#ff4f00] flex items-center justify-center text-white flex-shrink-0">
+                                <Gift size={20} />
+                              </div>
+                              
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 mb-1">
+                                  <h3 className="font-semibold text-gray-800 truncate">
+                                    {getOccasionLabel(giftCard.occasion || '')}
+                                  </h3>
+                                  <Badge className={`rounded-xl text-xs ${getStatusColor(giftCard.status || 'active')}`}>
+                                    {giftCard.status === 'active' ? 'فعال' :
+                                     giftCard.status === 'used' ? 'استفاده شده' :
+                                     giftCard.status === 'expired' ? 'منقضی' : 'نامشخص'}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-gray-600 truncate">
+                                  از طرف: {giftCard.senderName || 'نامشخص'}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {giftCard.receivedDate || 'نامشخص'}
+                                </p>
+                              </div>
+
+                              <div className="text-right flex-shrink-0">
+                                {giftCard.totalValue && (
+                                  <div className="font-bold text-gray-800">
+                                    {formatPrice(giftCard.totalValue)} تومان
+                                  </div>
+                                )}
+                                <div className="text-xs text-gray-600">
+                                  {giftCard.vouchers?.length || 0} آیتم
+                                </div>
+                              </div>
+
+                              <div className="flex gap-1 flex-shrink-0">
+                                <Button variant="ghost" className="rounded-xl p-2">
+                                  <Eye size={16} />
+                                </Button>
+                                <Button variant="ghost" className="rounded-xl p-2">
+                                  <Share2 size={16} />
+                                </Button>
+                                <Button variant="ghost" className="rounded-xl p-2">
+                                  <MoreVertical size={16} />
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Calendar Tab */}
             {activeTab === 'calendar' && (
               <PersianCalendar
-                userPhone={loggedInUser || ''}
+                userPhone={currentUser.phone}
                 savedDates={savedDates}
                 onSaveDates={setSavedDates}
               />
+            )}
+
+            {/* Settings Tab */}
+            {activeTab === 'settings' && (
+              <div className="space-y-6">
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings size={20} />
+                      تنظیمات حساب کاربری
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      <div>
+                        <div className="font-semibold text-gray-800">اعلان‌های ایمیل</div>
+                        <div className="text-sm text-gray-600">دریافت اعلان‌ها از طریق ایمیل</div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      <div>
+                        <div className="font-semibold text-gray-800">اعلان‌های پیامکی</div>
+                        <div className="text-sm text-gray-600">دریافت اعلان‌ها از طریق پیامک</div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                      <div>
+                        <div className="font-semibold text-gray-800">یادآوری تاریخ‌های مهم</div>
+                        <div className="text-sm text-gray-600">یادآوری تولد و مناسبت‌های مهم</div>
+                      </div>
+                      <Switch defaultChecked />
+                    </div>
+
+                    <Separator />
+
+                    <div className="space-y-4">
+                      <h3 className="font-semibold text-gray-800">مدیریت حساب</h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <Button variant="outline" className="rounded-xl justify-start">
+                          <Download size={18} className="ml-2" />
+                          دانلود اطلاعات حساب
+                        </Button>
+                        
+                        <Button variant="outline" className="rounded-xl justify-start text-red-600 border-red-200 hover:bg-red-50">
+                          <Trash2 size={18} className="ml-2" />
+                          حذف حساب کاربری
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             )}
           </div>
         </div>

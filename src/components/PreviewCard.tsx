@@ -96,7 +96,7 @@ ${totalPrice > 0 ? `💰 مبلغ: ${formatPrice(totalPrice)} تومان` : ''}
 
       <Card className="rounded-3xl shadow-lg overflow-hidden">
       <CardHeader className="p-0">
-        <div className={`h-40 bg-gradient-to-br ${selectedOccasion.gradient} relative overflow-hidden`}>
+        <div className={`h-32 lg:h-40 bg-gradient-to-br ${selectedOccasion.gradient} relative overflow-hidden`}>
           {/* المان‌های تزئینی */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-4 right-4 text-6xl">{selectedOccasion.theme.pattern}</div>
@@ -127,8 +127,8 @@ ${totalPrice > 0 ? `💰 مبلغ: ${formatPrice(totalPrice)} تومان` : ''}
           </div>
         </div>
       </CardHeader>
-      <CardContent className="-mt-14">
-        <div className="relative mx-auto max-w-md -mt-12">
+      <CardContent className="-mt-10 lg:-mt-14">
+        <div className="relative mx-auto max-w-md lg:max-w-lg -mt-8 lg:-mt-12">
           <div className="rounded-3xl border bg-white shadow-sm p-5 relative overflow-hidden">
             {/* بک‌گراند مینیمال */}
             <div className="absolute top-0 right-0 w-20 h-20 rounded-full opacity-5" style={{ backgroundColor: selectedOccasion.theme.primary }}></div>
@@ -154,13 +154,13 @@ ${totalPrice > 0 ? `💰 مبلغ: ${formatPrice(totalPrice)} تومان` : ''}
 
               <div className="space-y-1">
                 <div className="text-sm text-neutral-500">برای</div>
-                <div className="text-xl font-black">{recipientName || "—"}</div>
+                <div className="text-lg lg:text-xl font-black">{recipientName || "—"}</div>
                 <div className="text-sm text-neutral-500">از طرف</div>
                 <div className="font-semibold">{senderName || "—"}</div>
               </div>
 
               <div 
-                className="mt-4 rounded-2xl p-3 text-sm leading-7 border" 
+                className="mt-4 rounded-2xl p-3 text-xs lg:text-sm leading-6 lg:leading-7 border" 
                 style={{ 
                   backgroundColor: selectedOccasion.theme.primary + '08',
                   borderColor: selectedOccasion.theme.primary + '20'
@@ -169,78 +169,99 @@ ${totalPrice > 0 ? `💰 مبلغ: ${formatPrice(totalPrice)} تومان` : ''}
                 {message}
               </div>
 
-              <div className="mt-4 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-1 lg:gap-2">
                 {internet && (
-                  <Badge variant="secondary" className="rounded-xl flex items-center gap-1">
-                    <Wifi size={14} /> {INTERNET_PACKS.find((p) => p.id === internet)?.label} گیگ اینترنت
+                  <Badge variant="secondary" className="rounded-lg lg:rounded-xl flex items-center gap-1 text-xs">
+                    <Wifi size={12} className="lg:hidden" />
+                    <Wifi size={14} className="hidden lg:inline" />
+                    <span className="hidden lg:inline">{INTERNET_PACKS.find((p) => p.id === internet)?.label} گیگ اینترنت</span>
+                    <span className="lg:hidden">{INTERNET_PACKS.find((p) => p.id === internet)?.label}GB</span>
                   </Badge>
                 )}
                 {voice && (
-                  <Badge variant="secondary" className="rounded-xl flex items-center gap-1">
-                    <Phone size={14} /> {VOICE_PACKS.find((p) => p.id === voice)?.label}
+                  <Badge variant="secondary" className="rounded-lg lg:rounded-xl flex items-center gap-1 text-xs">
+                    <Phone size={12} className="lg:hidden" />
+                    <Phone size={14} className="hidden lg:inline" />
+                    <span>{VOICE_PACKS.find((p) => p.id === voice)?.label}</span>
                   </Badge>
                 )}
                 {dkVoucher && (
-                  <Badge variant="secondary" className="rounded-xl flex items-center gap-1">
-                    <ShoppingBag size={14} /> دیجی‌کالا {DIGIKALA_VOUCHERS.find((p) => p.id === dkVoucher)?.label}
+                  <Badge variant="secondary" className="rounded-lg lg:rounded-xl flex items-center gap-1 text-xs">
+                    <ShoppingBag size={12} className="lg:hidden" />
+                    <ShoppingBag size={14} className="hidden lg:inline" />
+                    <span className="hidden lg:inline">دیجی‌کالا {DIGIKALA_VOUCHERS.find((p) => p.id === dkVoucher)?.label}</span>
+                    <span className="lg:hidden">DK {DIGIKALA_VOUCHERS.find((p) => p.id === dkVoucher)?.label}</span>
                   </Badge>
                 )}
                 {ftVoucher && (
-                  <Badge variant="secondary" className="rounded-xl flex items-center gap-1">
-                    <Plane size={14} /> فلای‌تودی {FLYTODAY_VOUCHERS.find((p) => p.id === ftVoucher)?.label}
+                  <Badge variant="secondary" className="rounded-lg lg:rounded-xl flex items-center gap-1 text-xs">
+                    <Plane size={12} className="lg:hidden" />
+                    <Plane size={14} className="hidden lg:inline" />
+                    <span className="hidden lg:inline">فلای‌تودی {FLYTODAY_VOUCHERS.find((p) => p.id === ftVoucher)?.label}</span>
+                    <span className="lg:hidden">FT {FLYTODAY_VOUCHERS.find((p) => p.id === ftVoucher)?.label}</span>
                   </Badge>
                 )}
                 {oneYear && (
                   <Badge 
                     variant="outline" 
-                    className="rounded-xl" 
+                    className="rounded-lg lg:rounded-xl text-xs" 
                     style={{ borderColor: selectedOccasion.theme.primary, color: selectedOccasion.theme.primary }}
                   >
-                    اعتبار: یک‌سال
+                    <span className="hidden lg:inline">اعتبار: یک‌سال</span>
+                    <span className="lg:hidden">1 سال</span>
                   </Badge>
                 )}
               </div>
 
               {totalPrice > 0 && (
                 <div 
-                  className="mt-4 mb-6 rounded-2xl p-3 border"
+                  className="mt-4 mb-4 lg:mb-6 rounded-2xl p-3 border"
                   style={{ 
                     background: `linear-gradient(135deg, ${selectedOccasion.theme.primary}08, ${selectedOccasion.theme.secondary}08)`,
                     borderColor: selectedOccasion.theme.primary + '20'
                   }}
                 >
                   <div className="text-center">
-                    <div className="text-lg font-bold" style={{ color: selectedOccasion.theme.primary }}>
+                    <div className="text-base lg:text-lg font-bold" style={{ color: selectedOccasion.theme.primary }}>
                       {formatPrice(totalPrice)} تومان
                     </div>
-                    <div className="text-xs mt-2" style={{ color: selectedOccasion.theme.secondary }}>
+                    <div className="text-xs mt-1 lg:mt-2" style={{ color: selectedOccasion.theme.secondary }}>
                       مبلغ قابل پرداخت
                     </div>
                   </div>
                 </div>
               )}
 
-              <Separator className="my-8" />
+              <Separator className="my-4 lg:my-8" />
 
-              <div className="flex items-center justify-between">
-                <Button variant="ghost" className="rounded-xl text-neutral-500 hover:text-neutral-800">
-                  <Pencil size={18} className="ml-1" /> ویرایش جزئیات
+              <div className="flex items-center justify-between gap-2">
+                <Button variant="ghost" className="rounded-xl text-neutral-500 hover:text-neutral-800 text-xs lg:text-sm px-2 lg:px-4">
+                  <Pencil size={14} className="lg:hidden" />
+                  <Pencil size={18} className="hidden lg:inline ml-1" />
+                  <span className="hidden lg:inline">ویرایش جزئیات</span>
+                  <span className="lg:hidden">ویرایش</span>
                 </Button>
                 {isPaid ? (
                   <Button 
-                    className="rounded-xl text-white"
+                    className="rounded-xl text-white text-xs lg:text-sm px-2 lg:px-4"
                     onClick={() => setShowShareModal(true)}
                     style={{ backgroundColor: selectedOccasion.theme.primary }}
                   >
-                    <Share2 size={18} className="ml-1" /> دریافت لینک کارت
+                    <Share2 size={14} className="lg:hidden" />
+                    <Share2 size={18} className="hidden lg:inline ml-1" />
+                    <span className="hidden lg:inline">دریافت لینک کارت</span>
+                    <span className="lg:hidden">دریافت</span>
                   </Button>
                 ) : (
                   <Button 
                     variant="outline"
-                    className="rounded-xl text-neutral-400 cursor-not-allowed"
+                    className="rounded-xl text-neutral-400 cursor-not-allowed text-xs lg:text-sm px-2 lg:px-4"
                     disabled
                   >
-                    <Share2 size={18} className="ml-1" /> دریافت لینک کارت
+                    <Share2 size={14} className="lg:hidden" />
+                    <Share2 size={18} className="hidden lg:inline ml-1" />
+                    <span className="hidden lg:inline">دریافت لینک کارت</span>
+                    <span className="lg:hidden">دریافت</span>
                   </Button>
                 )}
               </div>
@@ -248,8 +269,8 @@ ${totalPrice > 0 ? `💰 مبلغ: ${formatPrice(totalPrice)} تومان` : ''}
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-center py-6 bg-neutral-50">
-        <div className="text-xs text-neutral-500">
+      <CardFooter className="flex items-center justify-center py-3 lg:py-6 bg-neutral-50">
+        <div className="text-xs text-neutral-500 text-center">
           تم فعلی: {selectedOccasion.label} • رنگ اصلی: {selectedOccasion.theme.primary}
         </div>
       </CardFooter>

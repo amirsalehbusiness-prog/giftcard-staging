@@ -37,24 +37,26 @@ export function Wizard({
   onPaymentComplete
 }: WizardProps) {
   return (
-    <Card className="rounded-2xl">
+    <Card className="rounded-2xl w-full">
       <CardHeader>
         <CardTitle className="text-xl">ویزارد هدیه</CardTitle>
         <CardDescription>در چند قدم ساده، هدیه‌ی دیجیتال یا فیزیکی خود را بسازید.</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-2 px-2">
+        <div className="flex gap-1 lg:gap-2 overflow-x-auto pb-2 -mx-2 px-2">
           {STEPS.map((s, i) => (
             <div key={s.key} className="flex items-center gap-2 whitespace-nowrap">
               <button
-                className={`rounded-full px-3 py-1.5 text-sm border transition ${
+                className={`rounded-full px-2 lg:px-3 py-1 lg:py-1.5 text-xs lg:text-sm border transition ${
                   i === step ? "bg-[#0095da] text-white border-transparent" : "bg-white text-neutral-700 border-neutral-200"
                 }`}
                 onClick={() => onStepChange(i)}
               >
-                {i + 1}. {s.title}
+                <span className="hidden lg:inline">{i + 1}. {s.title}</span>
+                <span className="lg:hidden">{i + 1}</span>
               </button>
-              {i < STEPS.length - 1 && <ChevronLeft className="text-neutral-300" size={18} />}
+              {i < STEPS.length - 1 && <ChevronLeft className="text-neutral-300 hidden lg:inline" size={18} />}
+              {i < STEPS.length - 1 && <ChevronLeft className="text-neutral-300 lg:hidden" size={14} />}
             </div>
           ))}
         </div>
