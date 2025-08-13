@@ -140,6 +140,7 @@ export function Wizard({
                 recipientName={data.recipientName}
                 recipientPhone={data.recipientPhone}
                 senderName={data.senderName}
+               message={data.message ?? ""}
                 internet={data.internet}
                 voice={data.voice}
                 dkVoucher={data.dkVoucher}
