@@ -15,6 +15,9 @@ import { Badge } from '../ui/badge';
 import { Card, CardContent } from '../ui/card';
 import { SocialFeed } from './SocialFeed';
 import { SocialProfile } from './SocialProfile';
+import { SocialMessaging } from './SocialMessaging';
+import { SocialNotifications } from './SocialNotifications';
+import { SocialExplore } from './SocialExplore';
 import { useSocial } from '../../contexts/SocialContext';
 import { useUser } from '../../contexts/UserContext';
 
@@ -154,33 +157,15 @@ export function SocialLayout({ onBackToMain }: SocialLayoutProps) {
             {activeTab === 'feed' && <SocialFeed />}
             
             {activeTab === 'explore' && (
-              <Card className="rounded-2xl">
-                <CardContent className="p-12 text-center" style={{ paddingTop: '48px' }}>
-                  <Search size={64} className="mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">کاوش و جستجو</h3>
-                  <p className="text-gray-600">قابلیت جستجو و کاوش کاربران در نسخه‌های آینده اضافه می‌شود</p>
-                </CardContent>
-              </Card>
+              <SocialExplore />
             )}
             
             {activeTab === 'notifications' && (
-              <Card className="rounded-2xl">
-                <CardContent className="p-12 text-center" style={{ paddingTop: '48px' }}>
-                  <Bell size={64} className="mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">اعلان‌ها</h3>
-                  <p className="text-gray-600">سیستم اعلان‌رسانی در نسخه‌های آینده اضافه می‌شود</p>
-                </CardContent>
-              </Card>
+              <SocialNotifications />
             )}
             
             {activeTab === 'messages' && (
-              <Card className="rounded-2xl">
-                <CardContent className="p-12 text-center" style={{ paddingTop: '48px' }}>
-                  <MessageCircle size={64} className="mx-auto mb-4 text-gray-300" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">پیام‌رسان</h3>
-                  <p className="text-gray-600">سیستم پیام‌رسانی در نسخه‌های آینده اضافه می‌شود</p>
-                </CardContent>
-              </Card>
+              <SocialMessaging />
             )}
             
             {activeTab === 'profile' && (

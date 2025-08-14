@@ -16,6 +16,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardContent, CardHeader } from '../ui/card';
 import { Badge } from '../ui/badge';
+import { CreatePostModal } from './CreatePostModal';
 import { useSocial } from '../../contexts/SocialContext';
 import { useUser } from '../../contexts/UserContext';
 import { formatPrice } from '../../utils/pricing';
@@ -264,6 +265,12 @@ export function SocialFeed() {
           );
         })
       )}
+
+      {/* Create Post Modal */}
+      <CreatePostModal
+        isOpen={showCreatePost}
+        onClose={() => setShowCreatePost(false)}
+      />
     </div>
   );
 }
