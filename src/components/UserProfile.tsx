@@ -39,7 +39,6 @@ import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
 import { UserInterestsManager } from './UserInterestsManager.tsx';
 import { SocialSetup } from './SocialSetup';
-import { SocialSetup } from './SocialSetup';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
 import type { GiftCard } from '../types';
@@ -56,7 +55,6 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   const { userAccounts, loggedInUser, updateUserAccount } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'social' | 'settings'>('giftCards');
   const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'social' | 'settings'>('giftCards');
   const [isEditing, setIsEditing] = useState(false);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
@@ -256,7 +254,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         : 'text-gray-700 hover:bg-gray-100'
                     }`}
                   >
-                    <Users size={20} />
+                    <User size={20} />
                     <span>شبکه اجتماعی</span>
                   </button>
                   
