@@ -194,6 +194,9 @@ export function ReviewCard({
                 ...(ftVoucher ? [`ووچر فلای‌تودی ${FLYTODAY_VOUCHERS.find(p => p.id === ftVoucher)?.label}`] : [])
               ]
             },
+            likes: [],
+            comments: [],
+            shares: [],
             isPublic: true
           });
         }, 1000);
