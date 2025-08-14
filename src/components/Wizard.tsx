@@ -144,7 +144,6 @@ export function Wizard({
                 recipientName={data.recipientName}
                 recipientPhone={data.recipientPhone}
                 senderPhone={data.senderPhone}
-              senderPhone={data.senderPhone}
                 senderName={data.senderName}
                message={data.message ?? ""}
                 internet={data.internet}
