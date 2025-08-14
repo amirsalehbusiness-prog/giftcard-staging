@@ -55,7 +55,6 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   const { userAccounts, loggedInUser, updateUserAccount } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'social' | 'settings'>('giftCards');
   const [isEditing, setIsEditing] = useState(false);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [showInterests, setShowInterests] = useState(false);
