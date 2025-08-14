@@ -4,11 +4,14 @@ import { Button } from "./components/ui/button";
 import { Badge } from "./components/ui/badge";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { UserProvider } from "./contexts/UserContext";
+import { AdminProvider } from "./contexts/AdminContext";
 
 import { Wizard } from "./components/Wizard";
 import { PreviewCard } from "./components/PreviewCard";
 import { LoginPage } from "./components/LoginPage";
 import { UserProfile } from "./components/UserProfile";
+import { AdminLogin } from "./components/admin/AdminLogin";
+import { AdminDashboard } from "./components/admin/AdminDashboard";
 
 import { OCCASIONS } from "./data/occasions";
 import { calculateTotalPrice } from "./utils/pricing";
@@ -18,7 +21,7 @@ import type { WizardData } from "./types";
 
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<"home" | "login" | "profile">("home");
+  const [currentPage, setCurrentPage] = useState<"home" | "login" | "profile" | "admin-login" | "admin-dashboard">("home");
   const [step, setStep] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isPaid, setIsPaid] = useState<boolean>(false);
@@ -60,6 +63,27 @@ function AppContent() {
   const handlePaymentComplete = () => {
     setIsPaid(true);
   };
+
+  // صفحه لاگین ادمین
+  if (currentPage === "admin-login") {
+    return (
+      <AdminLogin
+        onLogin={(username) => {
+          setCurrentPage("admin-dashboard");
+        }}
+        onBackToHome={() => setCurrentPage("home")}
+      />
+    );
+  }
+
+  // داشبورد ادمین
+  if (currentPage === "admin-dashboard") {
+    return (
+      <AdminDashboard
+        onLogout={() => setCurrentPage("home")}
+      />
+    );
+  }
 
   // صفحه لاگین
   if (currentPage === "login") {
@@ -162,6 +186,12 @@ function AppContent() {
             <a href="#" className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors">
               همکاری با ما
             </a>
+            <button
+              onClick={() => setCurrentPage("admin-login")}
+              className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors"
+            >
+              پنل مدیریت
+            </button>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -252,6 +282,15 @@ function AppContent() {
               <a href="#" className="block px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50" onClick={() => setMobileMenuOpen(false)}>
                 همکاری با ما
               </a>
+              <button
+                className="w-full text-right px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50"
+                onClick={() => {
+                  setCurrentPage("admin-login");
+                  setMobileMenuOpen(false);
+                }}
+              >
+                پنل مدیریت
+              </button>
             </nav>
 
             <div className="mt-8 pt-6 border-t border-neutral-200 bg-gray-50">
@@ -312,9 +351,11 @@ function AppContent() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <UserProvider>
-        <AppContent />
-      </UserProvider>
+      <AdminProvider>
+        <UserProvider>
+          <AppContent />
+        </UserProvider>
+      </AdminProvider>
     </ErrorBoundary>
   );
 }
