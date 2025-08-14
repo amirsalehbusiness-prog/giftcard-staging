@@ -452,7 +452,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <Star size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.amount || 0), 0) || 0)}
+                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.totalValue || card.totalPrice || 0), 0) || 0)}
                       </div>
                       <div className="text-sm text-gray-600">کل ارزش دریافتی (تومان)</div>
                     </CardContent>
