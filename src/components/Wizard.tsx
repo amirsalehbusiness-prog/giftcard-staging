@@ -91,12 +91,14 @@ export function Wizard({
               <MessageForm
                 recipientName={data.recipientName}
                 recipientPhone={data.recipientPhone}
+                senderPhone={data.senderPhone}
                 senderName={data.senderName}
                 message={data.message ?? ""}
                 oneYear={data.oneYear}
                 messagePlaceholder={messagePlaceholder}
                 onRecipientNameChange={(recipientName) => onDataChange({ recipientName })}
                 onRecipientPhoneChange={(recipientPhone) => onDataChange({ recipientPhone })}
+                onSenderPhoneChange={(senderPhone) => onDataChange({ senderPhone })}
                 onSenderNameChange={(senderName) => onDataChange({ senderName })}
                 onMessageChange={(message) => onDataChange({ message })}
                 onOneYearChange={(oneYear) => onDataChange({ oneYear })}
@@ -141,6 +143,7 @@ export function Wizard({
                 customOccasion={data.customOccasion}
                 recipientName={data.recipientName}
                 recipientPhone={data.recipientPhone}
+              senderPhone={data.senderPhone}
                 senderName={data.senderName}
                message={data.message ?? ""}
                 internet={data.internet}

@@ -60,12 +60,29 @@ export function ReviewCard({
   // ⬇️ ذخیره‌ی اعتبار ورود در localStorage (سازگار با ساختار قبلی پروژه)
   const savedRef = React.useRef(false);
   React.useEffect(() => {
-    if (!paymentCompleted || !recipientPhone || savedRef.current) return;
+    if (!paymentCompleted || savedRef.current) return;
 
     const KEY = "userAccounts";
 
     try {
-      const phone = String(recipientPhone).trim();
+      // Create accounts for both recipient and sender
+      const accounts = [];
+      
+      if (recipientPhone) {
+        accounts.push({
+          phone: String(recipientPhone).trim(),
+          name: recipientName || '',
+          role: 'recipient'
+        });
+      }
+      
+      if (senderPhone) {
+        accounts.push({
+          phone: String(senderPhone).trim(),
+          name: senderName || '',
+          role: 'sender'
+        });
+      }
       
       // Create gift card data
       const giftCardData = {
@@ -74,6 +91,7 @@ export function ReviewCard({
         customOccasion,
         recipientName,
         recipientPhone,
+        senderPhone,
         senderName,
         message: message || "پیام تبریک ارسال شده است",
         internet,
@@ -115,67 +133,72 @@ export function ReviewCard({
         ]
       };
 
-      // Use the UserContext's createUserAccount function
-      // We need to access this through the context, but since we're in useEffect,
-      // we'll directly manipulate localStorage for now
       const existingAccounts = JSON.parse(localStorage.getItem(KEY) || "[]");
-      const existingUserIndex = existingAccounts.findIndex((user: any) => user.phone === phone);
       
-      if (existingUserIndex >= 0) {
-        // Add gift card to existing user
-        existingAccounts[existingUserIndex].giftCards = existingAccounts[existingUserIndex].giftCards || [];
-        existingAccounts[existingUserIndex].giftCards.push(giftCardData);
-        existingAccounts[existingUserIndex].password = phone; // Ensure password is set correctly
-      } else {
-        // Create new user account
-        const newAccount = {
-          id: Date.now().toString(),
-          name: recipientName || '',
-          phone,
-          password: phone, // Use phone number as password
-          giftCards: [giftCardData]
-        };
-        existingAccounts.push(newAccount);
-      }
+      // Process each account (recipient and sender)
+      accounts.forEach((accountInfo) => {
+        const existingUserIndex = existingAccounts.findIndex((user: any) => user.phone === accountInfo.phone);
+        
+        if (existingUserIndex >= 0) {
+          // Add gift card to existing user (only for recipient)
+          if (accountInfo.role === 'recipient') {
+            existingAccounts[existingUserIndex].giftCards = existingAccounts[existingUserIndex].giftCards || [];
+            existingAccounts[existingUserIndex].giftCards.push(giftCardData);
+          }
+          existingAccounts[existingUserIndex].password = accountInfo.phone; // Ensure password is set correctly
+        } else {
+          // Create new user account
+          const newAccount = {
+            id: Date.now().toString(),
+            name: accountInfo.name,
+            phone: accountInfo.phone,
+            password: accountInfo.phone, // Use phone number as password
+            giftCards: accountInfo.role === 'recipient' ? [giftCardData] : []
+          };
+          existingAccounts.push(newAccount);
+        }
+        
+        // ایجاد پروفایل اجتماعی اگر وجود نداشته باشد
+        const existingSocialProfile = socialProfiles.find(p => p.userId === accountInfo.phone);
+        if (!existingSocialProfile) {
+          createSocialProfile(accountInfo.phone, {
+            displayName: accountInfo.name || 'کاربر جدید',
+            username: `user_${accountInfo.phone.slice(-6)}`,
+            showGiftStats: true,
+            showInterests: true,
+            showBirthday: true
+          });
+        }
+      });
       
       localStorage.setItem(KEY, JSON.stringify(existingAccounts));
 
-      // ایجاد پروفایل اجتماعی اگر وجود نداشته باشد
-      const existingSocialProfile = socialProfiles.find(p => p.userId === phone);
-      if (!existingSocialProfile) {
-        createSocialProfile(phone, {
-          displayName: recipientName || 'کاربر جدید',
-          username: `user_${phone.slice(-6)}`,
-          showGiftStats: true,
-          showInterests: true,
-          showBirthday: true
-        });
-      }
 
       // ایجاد پست خودکار برای دریافت هدیه
-      setTimeout(() => {
-        createPost({
-          authorId: phone,
-          content: `یک کارت هدیه زیبا برای ${getOccasionLabel(occasion)} دریافت کردم! 🎁`,
-          type: 'gift_received',
-          giftData: {
-            giftCardId: giftCardData.id,
-            occasion,
-            totalValue: totalPrice,
-            items: [
-              ...(internet ? [`${INTERNET_PACKS.find(p => p.id === internet)?.label} گیگ اینترنت`] : []),
-              ...(voice ? [`${VOICE_PACKS.find(p => p.id === voice)?.label}`] : []),
-              ...(dkVoucher ? [`ووچر دیجی‌کالا ${DIGIKALA_VOUCHERS.find(p => p.id === dkVoucher)?.label}`] : []),
-              ...(ftVoucher ? [`ووچر فلای‌تودی ${FLYTODAY_VOUCHERS.find(p => p.id === ftVoucher)?.label}`] : [])
-            ]
-          },
-          isPublic: true
-        });
-      }, 1000);
+      if (recipientPhone) {
+        setTimeout(() => {
+          createPost({
+            authorId: recipientPhone,
+            content: `یک کارت هدیه زیبا برای ${getOccasionLabel(occasion)} دریافت کردم! 🎁`,
+            type: 'gift_received',
+            giftData: {
+              giftCardId: giftCardData.id,
+              occasion,
+              totalValue: totalPrice,
+              items: [
+                ...(internet ? [`${INTERNET_PACKS.find(p => p.id === internet)?.label} گیگ اینترنت`] : []),
+                ...(voice ? [`${VOICE_PACKS.find(p => p.id === voice)?.label}`] : []),
+                ...(dkVoucher ? [`ووچر دیجی‌کالا ${DIGIKALA_VOUCHERS.find(p => p.id === dkVoucher)?.label}`] : []),
+                ...(ftVoucher ? [`ووچر فلای‌تودی ${FLYTODAY_VOUCHERS.find(p => p.id === ftVoucher)?.label}`] : [])
+              ]
+            },
+            isPublic: true
+          });
+        }, 1000);
+      }
 
       if (import.meta.env.DEV) {
-        console.log("✅ userAccounts updated for phone:", phone);
-        console.log("✅ Password set to:", phone);
+        console.log("✅ userAccounts updated for accounts:", accounts);
         console.log("✅ All accounts:", existingAccounts);
       }
 
@@ -183,7 +206,7 @@ export function ReviewCard({
     } catch (e) {
       console.warn("localStorage update error:", e);
     }
-  }, [paymentCompleted, recipientPhone]);
+  }, [paymentCompleted, recipientPhone, senderPhone]);
 
   const getOccasionLabel = (occasion: string) => {
     if (occasion === "custom") return customOccasion || "بهانه دلخواه";

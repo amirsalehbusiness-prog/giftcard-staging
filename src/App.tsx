@@ -33,6 +33,7 @@ function AppContent() {
     customOccasion: "",
     recipientName: "",
     recipientPhone: null, // ← مهم: nullable باشد
+    senderPhone: null,
     senderName: "",
     message: "تولدت مبارک! برات یک سال پر از شادی و حال خوب آرزو می‌کنم 🎉",
     internet: null,
@@ -354,6 +355,7 @@ function AppContent() {
   customOccasion={data.customOccasion}
   recipientName={data.recipientName}
   recipientPhone={data.recipientPhone}
+  senderPhone={data.senderPhone}
   senderName={data.senderName}
    message={data.message ?? ""} 
   internet={data.internet}

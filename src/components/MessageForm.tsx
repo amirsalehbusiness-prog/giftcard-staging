@@ -7,11 +7,13 @@ import { Switch } from "./ui/switch";
 type MessageFormProps = {
   recipientName: string;
   recipientPhone: string | null;
+  senderPhone: string | null;
   senderName: string;
   message: string;
   oneYear: boolean;
   onRecipientNameChange: (name: string) => void;
   onRecipientPhoneChange: (phone: string) => void;
+  onSenderPhoneChange: (phone: string) => void;
   onSenderNameChange: (name: string) => void;
   onMessageChange: (message: string) => void;
   onOneYearChange: (oneYear: boolean) => void;
@@ -23,11 +25,13 @@ type MessageFormProps = {
 export function MessageForm({
   recipientName,
   recipientPhone,
+  senderPhone,
   senderName,
   message,
   oneYear,
   onRecipientNameChange,
   onRecipientPhoneChange,
+  onSenderPhoneChange,
   onSenderNameChange,
   onMessageChange,
   onOneYearChange,
@@ -67,6 +71,17 @@ export function MessageForm({
             onChange={(e) => onSenderNameChange(e.target.value)} 
             placeholder="مثلاً: زهرا" 
             className="rounded-xl" 
+          />
+        </div>
+        <div>
+          <div className="text-sm mb-1">شماره موبایل فرستنده</div>
+          <Input 
+            value={senderPhone ?? ""} 
+            onChange={(e) => onSenderPhoneChange(e.target.value)} 
+            placeholder="مثلاً: 09987654321" 
+            className="rounded-xl" 
+            type="tel"
+            maxLength={11}
           />
         </div>
       </div>

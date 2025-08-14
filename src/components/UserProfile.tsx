@@ -38,6 +38,8 @@ import { PersianCalendar } from './PersianCalendar';
 import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
 import { UserInterestsManager } from './UserInterestsManager.tsx';
+import { SocialSetup } from './SocialSetup';
+import { SocialSetup } from './SocialSetup';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
 import type { GiftCard } from '../types';
@@ -54,7 +56,8 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   const { userAccounts, loggedInUser, updateUserAccount } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'settings'>('giftCards');
+  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'social' | 'settings'>('giftCards');
+  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'social' | 'settings'>('giftCards');
   const [isEditing, setIsEditing] = useState(false);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [showInterests, setShowInterests] = useState(false);
@@ -243,6 +246,18 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                   >
                     <Calendar size={20} />
                     <span>تقویم مناسبت</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('social')}
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
+                      activeTab === 'social' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <Users size={20} />
+                    <span>شبکه اجتماعی</span>
                   </button>
                   
                   <button
@@ -597,6 +612,13 @@ export function UserProfile({ onLogout }: UserProfileProps) {
               />
             )}
 
+            {/* Social Tab */}
+            {activeTab === 'social' && (
+              <SocialSetup
+                userPhone={currentUser.phone}
+                userName={currentUser.name}
+              />
+            )}
             {/* Settings Tab */}
             {activeTab === 'settings' && (
               <div className="space-y-6">

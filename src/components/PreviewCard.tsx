@@ -17,6 +17,7 @@ type PreviewCardProps = {
   customOccasion: string;
   recipientName: string;
   recipientPhone: string | null;
+  senderPhone: string | null;
   senderName: string;
   message: string;
   internet: string | null;
@@ -33,6 +34,7 @@ export function PreviewCard({
   customOccasion,
   recipientName,
   recipientPhone,
+  senderPhone,
   senderName,
   message,
   internet,
@@ -82,6 +84,7 @@ ${totalPrice > 0 ? `💰 مبلغ: ${formatPrice(totalPrice)} تومان` : ''}
           customOccasion={customOccasion}
           recipientName={recipientName}
           recipientPhone={recipientPhone}
+          senderPhone={senderPhone}
           senderName={senderName}
           message={message}
           internet={internet}

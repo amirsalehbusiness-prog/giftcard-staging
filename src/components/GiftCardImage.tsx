@@ -10,6 +10,7 @@ type GiftCardImageProps = {
   customOccasion: string;
   recipientName: string;
     recipientPhone: string | null; // ← تغییر
+  senderPhone: string | null;
   senderName: string;
   message: string;
   internet: string | null;
@@ -26,6 +27,7 @@ export function GiftCardImage({
   customOccasion,
   recipientName,
   recipientPhone,
+  senderPhone,
   senderName,
   message,
   internet,
