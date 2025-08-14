@@ -1,3 +1,4 @@
+import React from "react";
 import { useMemo, useState, useEffect } from "react";
 import { Gift, Menu, X } from "lucide-react";
 import { Button } from "./components/ui/button";
