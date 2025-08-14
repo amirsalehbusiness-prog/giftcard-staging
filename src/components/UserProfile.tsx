@@ -616,6 +616,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
               <SocialSetup
                 userPhone={currentUser.phone}
                 userName={currentUser.name}
+                onNavigateToSocial={onNavigateToSocial}
               />
             )}
             {/* Settings Tab */}

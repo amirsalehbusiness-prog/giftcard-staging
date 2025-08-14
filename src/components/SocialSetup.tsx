@@ -29,9 +29,10 @@ import { validatePhone } from '../utils/validation';
 type SocialSetupProps = {
   userPhone: string;
   userName: string;
+  onNavigateToSocial?: () => void;
 };
 
-export function SocialSetup({ userPhone, userName }: SocialSetupProps) {
+export function SocialSetup({ userPhone, userName, onNavigateToSocial }: SocialSetupProps) {
   const { socialProfiles, createSocialProfile, updateSocialProfile } = useSocial();
   const [step, setStep] = useState<'check' | 'setup' | 'profile'>('check');
   const [isEditing, setIsEditing] = useState(false);
@@ -114,10 +115,6 @@ export function SocialSetup({ userPhone, userName }: SocialSetupProps) {
     setIsEditing(false);
   };
 
-  const handleEnterSocialNetwork = () => {
-    // Direct navigation to social network since user is already logged in
-    window.dispatchEvent(new CustomEvent('navigateToSocial'));
-  };
 
   // Step 1: Check if user wants social profile
   if (step === 'check') {
@@ -561,6 +558,7 @@ export function SocialSetup({ userPhone, userName }: SocialSetupProps) {
                   
                   <Button
                     onClick={handleEnterSocialNetwork}
+                    onClick={() => onNavigateToSocial?.()}
                     className="rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 shadow-lg hover:shadow-xl transition-all"
                   >
                     <ArrowRight size={18} className="ml-2" />
