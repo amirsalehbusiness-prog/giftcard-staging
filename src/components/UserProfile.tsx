@@ -184,7 +184,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
         </Button>
       </div>
     );
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
