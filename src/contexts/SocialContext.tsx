@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { 
   SocialProfile, 
