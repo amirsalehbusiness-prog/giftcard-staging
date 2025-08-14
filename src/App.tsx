@@ -28,6 +28,15 @@ function AppContent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isPaid, setIsPaid] = useState<boolean>(false);
 
+  // Event listener برای انتقال به صفحه لاگین از ReviewCard
+  React.useEffect(() => {
+    const handleNavigateToLogin = () => {
+      setCurrentPage("login");
+    };
+
+    window.addEventListener('navigateToLogin', handleNavigateToLogin);
+    return () => window.removeEventListener('navigateToLogin', handleNavigateToLogin);
+  }, []);
   const [data, setData] = useState<WizardData>({
     occasion: "birthday",
     customOccasion: "",

@@ -1,8 +1,9 @@
 import React from "react";
 import { ChevronRight, Share2, CreditCard } from "lucide-react";
-import { Gift } from "lucide-react";
+import { Gift, User, LogIn } from "lucide-react";
 import { Button } from "./ui/button";
 import { useSocial } from "../contexts/SocialContext";
+import { useUser } from "../contexts/UserContext";
 import { OCCASIONS } from "../data/occasions";
 import {
   INTERNET_PACKS,
@@ -52,14 +53,17 @@ export function ReviewCard({
 }: ReviewCardProps) {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(isPaid);
+  const [showSenderProfilePrompt, setShowSenderProfilePrompt] = useState(false);
+  const [senderProfileCreated, setSenderProfileCreated] = useState(false);
   const { createSocialProfile, socialProfiles, createPost } = useSocial();
+  const { createUserAccount } = useUser();
 
   // هم‌راستا کردن وضعیت داخلی با prop
   React.useEffect(() => {
     setPaymentCompleted(isPaid);
   }, [isPaid]);
 
-  // ⬇️ ذخیره‌ی اعتبار ورود در localStorage (سازگار با ساختار قبلی پروژه)
+  // ⬇️ ذخیره‌ی اعتبار ورود در localStorage و نمایش پرامپت برای فرستنده
   const savedRef = React.useRef(false);
   React.useEffect(() => {
     if (!paymentCompleted || savedRef.current) return;
@@ -78,13 +82,7 @@ export function ReviewCard({
         });
       }
       
-      if (senderPhone) {
-        accounts.push({
-          phone: String(senderPhone).trim(),
-          name: senderName || '',
-          role: 'sender'
-        });
-      }
+      // فقط برای گیرنده حساب ایجاد می‌کنیم، برای فرستنده بعداً پرسیده می‌شود
       
       // Create gift card data
       const giftCardData = {
@@ -137,16 +135,15 @@ export function ReviewCard({
 
       const existingAccounts = JSON.parse(localStorage.getItem(KEY) || "[]");
       
-      // Process each account (recipient and sender)
-      accounts.forEach((accountInfo) => {
+      // فقط برای گیرنده حساب ایجاد می‌کنیم
+      if (recipientPhone) {
+        const accountInfo = accounts[0]; // recipient account
         const existingUserIndex = existingAccounts.findIndex((user: any) => user.phone === accountInfo.phone);
         
         if (existingUserIndex >= 0) {
-          // Add gift card to existing user (only for recipient)
-          if (accountInfo.role === 'recipient') {
-            existingAccounts[existingUserIndex].giftCards = existingAccounts[existingUserIndex].giftCards || [];
-            existingAccounts[existingUserIndex].giftCards.push(giftCardData);
-          }
+          // Add gift card to existing user
+          existingAccounts[existingUserIndex].giftCards = existingAccounts[existingUserIndex].giftCards || [];
+          existingAccounts[existingUserIndex].giftCards.push(giftCardData);
           existingAccounts[existingUserIndex].password = accountInfo.phone; // Ensure password is set correctly
         } else {
           // Create new user account
@@ -155,7 +152,7 @@ export function ReviewCard({
             name: accountInfo.name,
             phone: accountInfo.phone,
             password: accountInfo.phone, // Use phone number as password
-            giftCards: accountInfo.role === 'recipient' ? [giftCardData] : []
+            giftCards: [giftCardData]
           };
           existingAccounts.push(newAccount);
         }
@@ -171,7 +168,7 @@ export function ReviewCard({
             showBirthday: true
           });
         }
-      });
+      }
       
       localStorage.setItem(KEY, JSON.stringify(existingAccounts));
 
@@ -203,11 +200,18 @@ export function ReviewCard({
       }
 
       if (import.meta.env.DEV) {
-        console.log("✅ userAccounts updated for accounts:", accounts);
+        console.log("✅ userAccounts updated for recipient:", recipientPhone);
         console.log("✅ All accounts:", existingAccounts);
       }
 
       savedRef.current = true; // فقط یک‌بار ذخیره کند
+      
+      // نمایش پرامپت برای فرستنده (اگر شماره فرستنده وجود داشته باشد)
+      if (senderPhone && senderPhone !== recipientPhone) {
+        setTimeout(() => {
+          setShowSenderProfilePrompt(true);
+        }, 2000);
+      }
     } catch (e) {
       console.warn("localStorage update error:", e);
     }
@@ -229,6 +233,47 @@ export function ReviewCard({
     onPaymentComplete?.();
   };
 
+  const handleCreateSenderProfile = () => {
+    if (!senderPhone) return;
+    
+    // ایجاد حساب کاربری برای فرستنده
+    createUserAccount(senderPhone, {
+      id: `sender_${Date.now()}`,
+      occasion,
+      customOccasion,
+      recipientName,
+      recipientPhone,
+      senderPhone,
+      senderName,
+      message,
+      internet,
+      voice,
+      dkVoucher,
+      ftVoucher,
+      oneYear,
+      totalPrice,
+      totalValue: totalPrice,
+      isPaid: true,
+      createdAt: new Date().toISOString(),
+      status: 'active',
+      vouchers: []
+    });
+    
+    // ایجاد پروفایل اجتماعی برای فرستنده
+    const existingSocialProfile = socialProfiles.find(p => p.userId === senderPhone);
+    if (!existingSocialProfile) {
+      createSocialProfile(senderPhone, {
+        displayName: senderName || 'کاربر جدید',
+        username: `user_${senderPhone.slice(-6)}`,
+        showGiftStats: true,
+        showInterests: true,
+        showBirthday: true
+      });
+    }
+    
+    setSenderProfileCreated(true);
+    setShowSenderProfilePrompt(false);
+  };
   return (
     <>
       <div className="space-y-4">
@@ -336,6 +381,102 @@ export function ReviewCard({
           </div>
         )}
 
+        {/* پرامپت ایجاد پروفایل برای فرستنده */}
+        {showSenderProfilePrompt && senderPhone && (
+          <div className="rounded-2xl border bg-gradient-to-r from-purple-50 to-pink-50 p-6 border-purple-200">
+            <div className="text-center mb-4">
+              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white mx-auto mb-3">
+                <User size={24} />
+              </div>
+              <div className="text-purple-800 font-semibold mb-2">
+                🎁 ایجاد حساب کاربری برای مدیریت هدایا
+              </div>
+              <div className="text-sm text-purple-700 leading-6">
+                برای مدیریت کارت‌های هدیه‌ای که می‌دهید و احتمال دریافت هدیه در آینده، 
+                می‌خواهید حساب کاربری داشته باشید؟
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-4 mb-4 border border-purple-200">
+              <div className="text-sm text-gray-700 mb-3">
+                <strong>اطلاعات ورود شما:</strong>
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">نام کاربری:</span>
+                  <span className="font-mono font-semibold text-purple-800">
+                    {senderPhone}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">رمز عبور:</span>
+                  <span className="font-mono font-semibold text-purple-800">
+                    {senderPhone}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                onClick={handleCreateSenderProfile}
+                className="flex-1 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white"
+              >
+                <User size={18} className="ml-2" />
+                بله، حساب کاربری ایجاد کن
+              </Button>
+              <Button
+                onClick={() => setShowSenderProfilePrompt(false)}
+                variant="outline"
+                className="flex-1 rounded-xl border-purple-200 text-purple-700"
+              >
+                فعلاً نه، ممنون
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* نمایش اطلاعات ورود و دکمه لاگین برای فرستنده */}
+        {senderProfileCreated && senderPhone && (
+          <div className="rounded-2xl border bg-gradient-to-r from-green-50 to-emerald-50 p-6 border-green-200">
+            <div className="text-center mb-4">
+              <div className="text-green-600 font-semibold mb-2">
+                ✅ حساب کاربری شما با موفقیت ایجاد شد
+              </div>
+              <div className="text-sm text-green-700">
+                حالا می‌توانید وارد حساب کاربری خود شوید
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-xl p-4 mb-4 border border-green-200">
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">نام کاربری:</span>
+                  <span className="font-mono font-semibold text-green-800">
+                    {senderPhone}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-600">رمز عبور:</span>
+                  <span className="font-mono font-semibold text-green-800">
+                    {senderPhone}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <Button
+              onClick={() => {
+                // انتقال به صفحه لاگین
+                window.dispatchEvent(new CustomEvent('navigateToLogin'));
+              }}
+              className="w-full rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white"
+            >
+              <LogIn size={18} className="ml-2" />
+              ورود به حساب کاربری
+            </Button>
+          </div>
+        )}
         <div className="flex items-center justify-between gap-3">
           <Button variant="outline" className="rounded-xl" onClick={onPrevious}>
             <ChevronRight className="ml-1" size={18} /> قبلی
