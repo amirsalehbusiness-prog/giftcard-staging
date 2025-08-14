@@ -24,6 +24,7 @@ import { Card, CardContent } from './ui/card';
 import { OCCASIONS } from '../data/occasions';
 import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS, PURCHASE_LINKS } from '../data/packages';
 import { formatPrice } from '../utils/pricing';
+import { PersianDate } from '../utils/persianCalendar';
 import type { GiftCard, OccasionItem } from '../types';
 
 type GiftCardDetailsProps = {
@@ -109,6 +110,17 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
     if (occasion === 'custom') return giftCard.customOccasion || 'بهانه دلخواه';
     const found = OCCASIONS.find(o => o.key === occasion);
     return found ? found.label : occasion;
+  };
+
+  const formatPersianDate = (dateString?: string) => {
+    if (!dateString) return 'نامشخص';
+    try {
+      const date = new Date(dateString);
+      const persianDate = new PersianDate(date);
+      return persianDate.format('DD MMMM YYYY');
+    } catch (error) {
+      return 'نامشخص';
+    }
   };
 
   return (
@@ -292,7 +304,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">تاریخ دریافت:</span>
-                  <div className="font-medium">نامشخص</div>
+                  <div className="font-medium">{formatPersianDate(giftCard.createdAt)}</div>
                 </div>
                 <div>
                   <span className="text-gray-600">وضعیت:</span>
