@@ -24,7 +24,7 @@ import { Card, CardContent } from './ui/card';
 import { OCCASIONS } from '../data/occasions';
 import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS, PURCHASE_LINKS } from '../data/packages';
 import { formatPrice } from '../utils/pricing';
-import { PersianDate } from '../utils/persianCalendar';
+import { PersianDate, formatPersianNumber } from '../utils/persianCalendar';
 import type { GiftCard, OccasionItem } from '../types';
 
 type GiftCardDetailsProps = {
@@ -117,7 +117,9 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
     try {
       const date = new Date(dateString);
       const persianDate = new PersianDate(date);
-      return persianDate.format('DD MMMM YYYY');
+      const formatted = persianDate.format('DD MMMM YYYY');
+      // Convert numbers to Persian
+      return formatted.replace(/\d/g, (digit) => formatPersianNumber(parseInt(digit)).toString());
     } catch (error) {
       return 'نامشخص';
     }
@@ -300,8 +302,8 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
 
           {/* Expanded Details */}
           {isExpanded && (
-            <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="mt-6 pt-6 border-t border-gray-200 space-y-4" dir="rtl">
+              <div className="grid grid-cols-2 gap-4 text-sm" dir="rtl">
                 <div>
                   <span className="text-gray-600">تاریخ دریافت:</span>
                   <div className="font-medium">{formatPersianDate(giftCard.createdAt)}</div>
