@@ -60,11 +60,30 @@ export type UserAccount = {
   password: string;
   email?: string;
   birthDate?: string;
-  giftPreferences?: {
-    category: string;
-    subcategory: string;
-  };
+  interests?: UserInterests;
   giftCards: GiftCard[]; // ← اضافه شد
+};
+
+export type InterestCategory = {
+  id: string;
+  name: string;
+  icon: string;
+  subcategories: InterestSubcategory[];
+};
+
+export type InterestSubcategory = {
+  id: string;
+  name: string;
+  icon: string;
+};
+
+export type UserInterests = {
+  selectedInterests: {
+    categoryId: string;
+    subcategoryIds: string[];
+  }[];
+  isPublic: boolean;
+  lastUpdated: string;
 };
 // فقط برای بیلد؛ اگر لازم شد بعداً دقیق‌ترش کن
 export type GiftCard = {

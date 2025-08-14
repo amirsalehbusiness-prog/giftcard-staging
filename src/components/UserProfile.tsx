@@ -37,6 +37,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { PersianCalendar } from './PersianCalendar';
 import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
+import { UserInterestsManager } from './UserInterestsManager';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
 import type { GiftCard } from '../types';
@@ -56,6 +57,7 @@ export function UserProfile({ onLogout }: UserProfileProps) {
   const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'settings'>('giftCards');
   const [isEditing, setIsEditing] = useState(false);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
+  const [showInterests, setShowInterests] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -415,6 +417,45 @@ export function UserProfile({ onLogout }: UserProfileProps) {
                         <Button onClick={handleCancelEdit} variant="outline" className="rounded-xl">
                           انصراف
                         </Button>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* User Interests */}
+                <Card className="rounded-2xl">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="flex items-center gap-2">
+                        <Star size={20} />
+                        علاقمندی‌ها
+                      </CardTitle>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-gray-600">نمایش علاقمندی‌ها:</span>
+                          <Switch
+                            checked={showInterests}
+                            onCheckedChange={setShowInterests}
+                          />
+                          {showInterests ? <Eye size={16} /> : <EyeOff size={16} />}
+                        </div>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    {showInterests ? (
+                      <UserInterestsManager
+                        userPhone={currentUser.phone}
+                        currentInterests={currentUser.interests}
+                        onUpdateInterests={(interests) => {
+                          updateUserAccount(currentUser.phone, { interests });
+                        }}
+                      />
+                    ) : (
+                      <div className="text-center py-8 text-gray-500">
+                        <EyeOff size={48} className="mx-auto mb-4 opacity-50" />
+                        <p>علاقمندی‌ها مخفی شده است</p>
+                        <p className="text-sm">برای مشاهده و ویرایش، گزینه "نمایش علاقمندی‌ها" را فعال کنید</p>
                       </div>
                     )}
                   </CardContent>
