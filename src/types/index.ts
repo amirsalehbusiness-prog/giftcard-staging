@@ -4,8 +4,9 @@ import type { ComponentType } from "react";
 export type Voucher = {
   id: string;
   type?: string;
-  value?: string | number;
-  // Add other fields as necessary
+  amount?: string | number;
+  used?: boolean;
+  value?: string | number; // Keep for backward compatibility
 };
 
 export type OccasionItem = { 
@@ -52,13 +53,24 @@ export type StepInfo = {
 export type UserAccount = {
   id: string;
   name: string;
+  firstName?: string;
+  lastName?: string;
+  nationalId?: string;
   phone: string;
   password: string;
   email?: string;
+  birthDate?: string;
+  giftPreferences?: {
+    category: string;
+    subcategory: string;
+  };
   giftCards: GiftCard[]; // ← اضافه شد
 };
 // فقط برای بیلد؛ اگر لازم شد بعداً دقیق‌ترش کن
 export type GiftCard = {
+  amount: number;
+  totalValue: number;
+  status: string;
   id: string;
   occasion?: string | null;
   customOccasion?: string;
