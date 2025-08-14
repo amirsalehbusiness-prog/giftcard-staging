@@ -124,7 +124,7 @@ export function AdminUsersManager() {
 
       {/* Filters */}
       <Card className="rounded-2xl">
-        <CardContent className="p-4">
+        <CardContent className="p-4" style={{ paddingTop: '24px' }}>
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             <div className="flex items-center gap-4 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-80">

@@ -132,7 +132,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
           {/* Sidebar Navigation */}
           <div className="lg:col-span-1">
             <Card className="rounded-2xl sticky top-24">
-              <CardContent className="p-4">
+              <CardContent className="p-4" style={{ paddingTop: '24px' }}>
                 <nav className="space-y-2">
                   <button
                     onClick={() => setActiveTab('overview')}
@@ -220,7 +220,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 {analyticsData && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card className="rounded-2xl">
-                      <CardContent className="p-6">
+                      <CardContent className="p-6" style={{ paddingTop: '24px' }}>
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-600">کل فروش</p>
@@ -236,7 +236,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </Card>
 
                     <Card className="rounded-2xl">
-                      <CardContent className="p-6">
+                      <CardContent className="p-6" style={{ paddingTop: '24px' }}>
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-600">کل سفارشات</p>
@@ -252,7 +252,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </Card>
 
                     <Card className="rounded-2xl">
-                      <CardContent className="p-6">
+                      <CardContent className="p-6" style={{ paddingTop: '24px' }}>
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-600">کل کاربران</p>
@@ -268,7 +268,7 @@ export function AdminDashboard({ onLogout }: AdminDashboardProps) {
                     </Card>
 
                     <Card className="rounded-2xl">
-                      <CardContent className="p-6">
+                      <CardContent className="p-6" style={{ paddingTop: '24px' }}>
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm text-gray-600">کسب‌وکارها</p>

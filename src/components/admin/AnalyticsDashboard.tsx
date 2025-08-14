@@ -69,7 +69,7 @@ export function AnalyticsDashboard() {
 
       {/* Filters */}
       <Card className="rounded-2xl">
-        <CardContent className="p-4">
+        <CardContent className="p-4" style={{ paddingTop: '24px' }}>
           <div className="flex flex-col lg:flex-row gap-4 items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export function AnalyticsDashboard() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="rounded-2xl">
-          <CardContent className="p-6">
+          <CardContent className="p-6" style={{ paddingTop: '24px' }}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">کل فروش</p>
@@ -152,7 +152,7 @@ export function AnalyticsDashboard() {
         </Card>
 
         <Card className="rounded-2xl">
-          <CardContent className="p-6">
+          <CardContent className="p-6" style={{ paddingTop: '24px' }}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">کل سفارشات</p>
@@ -169,7 +169,7 @@ export function AnalyticsDashboard() {
         </Card>
 
         <Card className="rounded-2xl">
-          <CardContent className="p-6">
+          <CardContent className="p-6" style={{ paddingTop: '24px' }}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">کل کاربران</p>
@@ -186,7 +186,7 @@ export function AnalyticsDashboard() {
         </Card>
 
         <Card className="rounded-2xl">
-          <CardContent className="p-6">
+          <CardContent className="p-6" style={{ paddingTop: '24px' }}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">میانگین سفارش</p>
