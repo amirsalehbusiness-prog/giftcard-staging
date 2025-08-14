@@ -163,7 +163,7 @@ export function AdminUsersManager() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredUsers.map((user) => (
           <Card key={user.id} className="rounded-2xl hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
+            <CardContent className="p-6" style={{ paddingTop: '24px' }}>
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white">
