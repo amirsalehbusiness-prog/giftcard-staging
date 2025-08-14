@@ -75,6 +75,18 @@ export function SocialLayout({ onBackToMain }: SocialLayoutProps) {
                   </button>
                   
                   <button
+                    onClick={() => setActiveTab('profile')}
+                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
+                      activeTab === 'profile' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <User size={20} />
+                    <span>پروفایل</span>
+                  </button>
+                  
+                  <button
                     onClick={() => setActiveTab('explore')}
                     className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
                       activeTab === 'explore' 
@@ -113,18 +125,6 @@ export function SocialLayout({ onBackToMain }: SocialLayoutProps) {
                   >
                     <MessageCircle size={20} />
                     <span>پیام‌ها</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => setActiveTab('profile')}
-                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all ${
-                      activeTab === 'profile' 
-                        ? 'bg-[#0095da] text-white' 
-                        : 'text-gray-700 hover:bg-gray-100'
-                    }`}
-                  >
-                    <User size={20} />
-                    <span>پروفایل</span>
                   </button>
                 </nav>
 
