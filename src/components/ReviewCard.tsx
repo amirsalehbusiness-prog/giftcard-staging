@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronRight, Share2, CreditCard } from "lucide-react";
 import { Gift } from "lucide-react";
 import { Button } from "./ui/button";
+import { useSocial } from "../contexts/SocialContext";
 import { OCCASIONS } from "../data/occasions";
 import {
   INTERNET_PACKS,
@@ -49,6 +50,7 @@ export function ReviewCard({
 }: ReviewCardProps) {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(isPaid);
+  const { createSocialProfile, socialProfiles, createPost } = useSocial();
 
   // هم‌راستا کردن وضعیت داخلی با prop
   React.useEffect(() => {
@@ -138,6 +140,39 @@ export function ReviewCard({
       
       localStorage.setItem(KEY, JSON.stringify(existingAccounts));
 
+      // ایجاد پروفایل اجتماعی اگر وجود نداشته باشد
+      const existingSocialProfile = socialProfiles.find(p => p.userId === phone);
+      if (!existingSocialProfile) {
+        createSocialProfile(phone, {
+          displayName: recipientName || 'کاربر جدید',
+          username: `user_${phone.slice(-6)}`,
+          showGiftStats: true,
+          showInterests: true,
+          showBirthday: true
+        });
+      }
+
+      // ایجاد پست خودکار برای دریافت هدیه
+      setTimeout(() => {
+        createPost({
+          authorId: phone,
+          content: `یک کارت هدیه زیبا برای ${getOccasionLabel(occasion)} دریافت کردم! 🎁`,
+          type: 'gift_received',
+          giftData: {
+            giftCardId: giftCardData.id,
+            occasion,
+            totalValue: totalPrice,
+            items: [
+              ...(internet ? [`${INTERNET_PACKS.find(p => p.id === internet)?.label} گیگ اینترنت`] : []),
+              ...(voice ? [`${VOICE_PACKS.find(p => p.id === voice)?.label}`] : []),
+              ...(dkVoucher ? [`ووچر دیجی‌کالا ${DIGIKALA_VOUCHERS.find(p => p.id === dkVoucher)?.label}`] : []),
+              ...(ftVoucher ? [`ووچر فلای‌تودی ${FLYTODAY_VOUCHERS.find(p => p.id === ftVoucher)?.label}`] : [])
+            ]
+          },
+          isPublic: true
+        });
+      }, 1000);
+
       if (import.meta.env.DEV) {
         console.log("✅ userAccounts updated for phone:", phone);
         console.log("✅ Password set to:", phone);
@@ -149,6 +184,12 @@ export function ReviewCard({
       console.warn("localStorage update error:", e);
     }
   }, [paymentCompleted, recipientPhone]);
+
+  const getOccasionLabel = (occasion: string) => {
+    if (occasion === "custom") return customOccasion || "بهانه دلخواه";
+    const found = OCCASIONS.find((o) => o.key === occasion);
+    return found ? found.label : occasion;
+  };
 
   const handlePayment = async () => {
     setIsProcessingPayment(true);

@@ -5,6 +5,7 @@ import { Badge } from "./components/ui/badge";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 import { UserProvider } from "./contexts/UserContext";
 import { AdminProvider } from "./contexts/AdminContext";
+import { SocialProvider } from "./contexts/SocialContext";
 
 import { Wizard } from "./components/Wizard";
 import { PreviewCard } from "./components/PreviewCard";
@@ -12,6 +13,7 @@ import { LoginPage } from "./components/LoginPage";
 import { UserProfile } from "./components/UserProfile";
 import { AdminLogin } from "./components/admin/AdminLogin";
 import { AdminDashboard } from "./components/admin/AdminDashboard";
+import { SocialLayout } from "./components/social/SocialLayout";
 
 import { OCCASIONS } from "./data/occasions";
 import { calculateTotalPrice } from "./utils/pricing";
@@ -21,7 +23,7 @@ import type { WizardData } from "./types";
 
 
 function AppContent() {
-  const [currentPage, setCurrentPage] = useState<"home" | "login" | "profile" | "admin-login" | "admin-dashboard">("home");
+  const [currentPage, setCurrentPage] = useState<"home" | "login" | "profile" | "admin-login" | "admin-dashboard" | "social">("home");
   const [step, setStep] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isPaid, setIsPaid] = useState<boolean>(false);
@@ -63,6 +65,15 @@ function AppContent() {
   const handlePaymentComplete = () => {
     setIsPaid(true);
   };
+
+  // صفحه شبکه اجتماعی
+  if (currentPage === "social") {
+    return (
+      <SocialLayout
+        onBackToMain={() => setCurrentPage("home")}
+      />
+    );
+  }
 
   // صفحه لاگین ادمین
   if (currentPage === "admin-login") {
@@ -187,6 +198,12 @@ function AppContent() {
               همکاری با ما
             </a>
             <button
+              onClick={() => setCurrentPage("social")}
+              className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors"
+            >
+              شبکه اجتماعی
+            </button>
+            <button
               onClick={() => setCurrentPage("admin-login")}
               className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors"
             >
@@ -285,6 +302,15 @@ function AppContent() {
               <button
                 className="w-full text-right px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50"
                 onClick={() => {
+                  setCurrentPage("social");
+                  setMobileMenuOpen(false);
+                }}
+              >
+                شبکه اجتماعی
+              </button>
+              <button
+                className="w-full text-right px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50"
+                onClick={() => {
                   setCurrentPage("admin-login");
                   setMobileMenuOpen(false);
                 }}
@@ -351,11 +377,13 @@ function AppContent() {
 export default function App() {
   return (
     <ErrorBoundary>
-      <AdminProvider>
-        <UserProvider>
-          <AppContent />
-        </UserProvider>
-      </AdminProvider>
+      <SocialProvider>
+        <AdminProvider>
+          <UserProvider>
+            <AppContent />
+          </UserProvider>
+        </AdminProvider>
+      </SocialProvider>
     </ErrorBoundary>
   );
 }
