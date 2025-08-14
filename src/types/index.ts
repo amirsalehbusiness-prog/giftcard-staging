@@ -4,8 +4,9 @@ import type { ComponentType } from "react";
 export type Voucher = {
   id: string;
   type?: string;
-  value?: string | number;
-  // Add other fields as necessary
+  amount?: string | number;
+  used?: boolean;
+  value?: string | number; // Keep for backward compatibility
 };
 
 export type OccasionItem = { 
