@@ -28,7 +28,7 @@ export type BusinessPartner = {
   category: 'telecom' | 'ecommerce' | 'travel' | 'food' | 'entertainment' | 'other';
   apiConfig: {
     baseUrl: string;
-    apiKey?: string;
+    apiKey: string;
     authType: 'api_key' | 'oauth' | 'basic_auth';
     endpoints: {
       vouchers: string;

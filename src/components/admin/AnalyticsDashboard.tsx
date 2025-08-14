@@ -230,7 +230,7 @@ export function AnalyticsDashboard() {
                     />
                     <div className="text-xs text-gray-500 text-center">
                       {timeFilter === 'day' 
-                        ? new Date(item.date || '').getDate().toString()
+                        ? new Date((item as any).date || '').getDate().toString()
                         : timeFilter === 'week' 
                         ? (item as any).week 
                         : (item as any).month

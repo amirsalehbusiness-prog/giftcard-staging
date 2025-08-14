@@ -37,7 +37,7 @@ export function BusinessPartnersManager() {
     category: 'ecommerce' as BusinessPartner['category'],
     apiConfig: {
       baseUrl: '',
-      apiKey: '',
+      apiKey: 'your-api-key',
       authType: 'api_key' as BusinessPartner['apiConfig']['authType'],
       endpoints: {
         vouchers: '/vouchers',
