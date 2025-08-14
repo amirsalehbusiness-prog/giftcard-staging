@@ -52,6 +52,7 @@ type UserProfileProps = {
 type ViewMode = 'grid' | 'list';
 type FilterType = 'all' | 'active' | 'used' | 'expired';
 
+export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) {
   const { userAccounts, loggedInUser, updateUserAccount } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   
@@ -74,16 +75,6 @@ type FilterType = 'all' | 'active' | 'used' | 'expired';
     nationalId: '',
     birthDate: ''
   });
-
-  // Listen for social navigation event
-  React.useEffect(() => {
-    const handleSocialNavigation = () => {
-      onNavigateToSocial?.();
-    };
-    
-    window.addEventListener('navigateToSocial', handleSocialNavigation);
-    return () => window.removeEventListener('navigateToSocial', handleSocialNavigation);
-  }, [onNavigateToSocial]);
 
   const currentUser = userAccounts.find(user => user.phone === loggedInUser);
 
