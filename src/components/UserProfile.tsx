@@ -75,6 +75,16 @@ type FilterType = 'all' | 'active' | 'used' | 'expired';
     birthDate: ''
   });
 
+  // Listen for social navigation event
+  React.useEffect(() => {
+    const handleSocialNavigation = () => {
+      onNavigateToSocial?.();
+    };
+    
+    window.addEventListener('navigateToSocial', handleSocialNavigation);
+    return () => window.removeEventListener('navigateToSocial', handleSocialNavigation);
+  }, [onNavigateToSocial]);
+
   const currentUser = userAccounts.find(user => user.phone === loggedInUser);
 
   React.useEffect(() => {

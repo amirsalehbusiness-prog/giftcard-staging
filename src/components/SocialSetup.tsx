@@ -561,7 +561,7 @@ export function SocialSetup({ userPhone, userName }: SocialSetupProps) {
                   
                   <Button
                     onClick={handleEnterSocialNetwork}
-                    className="rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3"
+                    className="rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 shadow-lg hover:shadow-xl transition-all"
                   >
                     <ArrowRight size={18} className="ml-2" />
                     ورود به شبکه اجتماعی
