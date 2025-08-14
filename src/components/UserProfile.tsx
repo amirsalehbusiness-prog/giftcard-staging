@@ -46,12 +46,12 @@ import type { SavedDate } from '../types/calendar';
 
 type UserProfileProps = {
   onLogout: () => void;
+  onNavigateToSocial?: () => void;
 };
 
 type ViewMode = 'grid' | 'list';
 type FilterType = 'all' | 'active' | 'used' | 'expired';
 
-export function UserProfile({ onLogout }: UserProfileProps) {
   const { userAccounts, loggedInUser, updateUserAccount } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   

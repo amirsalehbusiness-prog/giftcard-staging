@@ -115,11 +115,8 @@ export function SocialSetup({ userPhone, userName }: SocialSetupProps) {
   };
 
   const handleEnterSocialNetwork = () => {
-    if (confirm('آیا می‌خواهید وارد شبکه اجتماعی هدیه همراه شوید؟')) {
-      // Navigate to social network (this would be handled by parent component)
-      window.location.hash = '#social';
-      // In a real app, you might use React Router or similar
-    }
+    // Direct navigation to social network since user is already logged in
+    window.dispatchEvent(new CustomEvent('navigateToSocial'));
   };
 
   // Step 1: Check if user wants social profile
