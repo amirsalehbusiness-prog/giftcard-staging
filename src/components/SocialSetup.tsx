@@ -557,7 +557,6 @@ export function SocialSetup({ userPhone, userName, onNavigateToSocial }: SocialS
                   </p>
                   
                   <Button
-                    onClick={handleEnterSocialNetwork}
                     onClick={() => onNavigateToSocial?.()}
                     className="rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 shadow-lg hover:shadow-xl transition-all"
                   >
