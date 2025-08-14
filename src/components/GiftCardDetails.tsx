@@ -251,7 +251,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
             </div>
             
             <div className="grid grid-cols-2 gap-2">
-              {giftCard.vouchers?.map((voucher, index) => (
+              {(Array.isArray(giftCard.vouchers) ? giftCard.vouchers : []).map((voucher, index) => (
                 <div 
                   key={index}
                   className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
@@ -361,7 +361,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
               </div>
 
               <div className="space-y-3">
-                {giftCard.vouchers?.map((voucher, index) => (
+                {(Array.isArray(giftCard.vouchers) ? giftCard.vouchers : []).map((voucher, index) => (
                   <div 
                     key={index}
                     className="border rounded-xl p-4 bg-white"
