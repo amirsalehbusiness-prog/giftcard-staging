@@ -292,7 +292,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <span className="text-gray-600">تاریخ دریافت:</span>
-                  <div className="font-medium">{giftCard.receivedDate || 'نامشخص'}</div>
+                  <div className="font-medium">نامشخص</div>
                 </div>
                 <div>
                   <span className="text-gray-600">وضعیت:</span>
@@ -312,7 +312,6 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
                     <Button
                       key={index}
                       variant="outline"
-                      size="sm"
                       className="rounded-xl text-xs"
                       onClick={() => window.open(getVoucherLink(voucher.type || ''), '_blank')}
                     >
@@ -379,7 +378,6 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
                           <span className="text-sm text-gray-600">کد ووچر:</span>
                           <Button
                             variant="ghost"
-                            size="sm"
                             onClick={() => toggleVoucherVisibility(voucher.id || '')}
                             className="rounded-lg"
                           >
@@ -395,7 +393,6 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
                               </code>
                               <Button
                                 variant="ghost"
-                                size="sm"
                                 onClick={() => handleCopyVoucher(
                                   voucher.id || '', 
                                   voucher.id || 'SAMPLE-CODE-' + Math.random().toString(36).substr(2, 9).toUpperCase()
@@ -412,9 +409,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
                         )}
 
                         <Button
-                          variant="outline"
-                          size="sm"
-                          variant={voucher.used ? 'secondary' : 'solid'}
+                          variant={voucher.used ? 'outline' : 'solid'}
                           className={`rounded-xl ${voucher.used ? '' : 'bg-[#439C55] hover:bg-[#3a8549] text-white'}`}
                         >
                           <ExternalLink size={14} className="ml-2" />
