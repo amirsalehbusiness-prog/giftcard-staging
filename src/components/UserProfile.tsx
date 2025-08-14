@@ -37,7 +37,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 import { PersianCalendar } from './PersianCalendar';
 import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
-import { UserInterestsManager } from './UserInterestsManager';
+import { UserInterestsManager } from './UserInterestsManager.tsx';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
 import type { GiftCard } from '../types';
