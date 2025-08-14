@@ -18,6 +18,7 @@ type ReviewCardProps = {
   customOccasion: string;
   recipientName: string;
   recipientPhone: string | null;
+  senderPhone: string | null;
   senderName: string;
   message: string;
   internet: string | null;
@@ -36,6 +37,7 @@ export function ReviewCard({
   customOccasion,
   recipientName,
   recipientPhone,
+  senderPhone,
   senderName,
   message,
   internet,
