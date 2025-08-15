@@ -621,7 +621,6 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         : 'کارت‌های هدیه‌ای که برای دیگران خریده‌اید در اینجا نمایش داده می‌شود'
                       }
                     </div>
-                  </div>
                   </CardContent>
                 </Card>
                 {filteredGiftCards.length === 0 ? (
