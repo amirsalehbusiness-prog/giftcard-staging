@@ -119,7 +119,6 @@ export function PersianCalendar({ userPhone, savedDates, onSaveDates }: PersianC
   const handleSaveDate = (dateData: Omit<SavedDate, 'id' | 'createdAt'>) => {
     const newDate: SavedDate = {
       ...dateData,
-      userId: userPhone,
       id: Date.now().toString(),
       createdAt: new Date().toISOString()
     };
