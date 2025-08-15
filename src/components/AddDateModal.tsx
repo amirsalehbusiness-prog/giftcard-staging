@@ -11,7 +11,7 @@ type AddDateModalProps = {
   selectedDate: { year?: number; month: number; day: number };
   editingDate: SavedDate | null;
   userPhone: string;
-  onSave: (dateData: Omit<SavedDate, 'id' | 'createdAt'>) => void;
+  onSave: (dateData: Omit<SavedDate, 'id' | 'createdAt' | 'userId'>) => void;
   onClose: () => void;
 };
 

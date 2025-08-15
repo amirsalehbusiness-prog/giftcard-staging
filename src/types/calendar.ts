@@ -1,5 +1,6 @@
 export type SavedDate = {
   id: string;
+  userId: string;
   title: string;
   date: {
     year?: number;

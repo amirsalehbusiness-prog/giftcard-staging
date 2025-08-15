@@ -106,6 +106,7 @@ export function PersianCalendar({ userPhone, savedDates, onSaveDates }: PersianC
 
   const getSavedDateForDay = (day: number): SavedDate | undefined => {
     return savedDates.find(saved => 
+      saved.userId === userPhone &&
       saved.date.month === currentDate.month &&
       saved.date.day === day
     );
@@ -118,6 +119,7 @@ export function PersianCalendar({ userPhone, savedDates, onSaveDates }: PersianC
   const handleSaveDate = (dateData: Omit<SavedDate, 'id' | 'createdAt'>) => {
     const newDate: SavedDate = {
       ...dateData,
+      userId: userPhone,
       id: Date.now().toString(),
       createdAt: new Date().toISOString()
     };
@@ -375,11 +377,11 @@ export function PersianCalendar({ userPhone, savedDates, onSaveDates }: PersianC
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star size={20} />
-            تاریخ‌های ذخیره شده ({formatPersianNumber(savedDates.length)})
+            تاریخ‌های ذخیره شده ({formatPersianNumber(savedDates.filter(d => d.userId === userPhone).length)})
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {savedDates.length === 0 ? (
+          {savedDates.filter(d => d.userId === userPhone).length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Calendar size={48} className="mx-auto mb-4 opacity-50" />
               <p>هنوز تاریخی ذخیره نکرده‌اید</p>
@@ -388,6 +390,7 @@ export function PersianCalendar({ userPhone, savedDates, onSaveDates }: PersianC
           ) : (
             <div className="space-y-3">
               {savedDates
+                .filter(savedDate => savedDate.userId === userPhone)
                 .sort((a, b) => {
                const dateA = PersianDate.fromPersian(a.date.year!, a.date.month!, a.date.day!);
 const dateB = PersianDate.fromPersian(b.date.year!, b.date.month!, b.date.day!);
