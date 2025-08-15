@@ -96,6 +96,7 @@ export type GiftCard = {
   customOccasion?: string;
   recipientName?: string;
   recipientPhone?: string | null;
+  senderPhone?: string | null;
   senderName?: string;
   message?: string;
   internet?: string | null;
