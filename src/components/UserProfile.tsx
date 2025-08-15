@@ -160,7 +160,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
     }
     
     return filtered.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-  }, [currentUser?.giftCards, filterType, searchQuery]);
+  }, [currentUser?.giftCards, filterType, searchQuery, giftCardView, currentUser?.phone]);
 
   const getOccasionLabel = (occasion: string) => {
     const found = OCCASIONS.find(o => o.key === occasion);
@@ -198,7 +198,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
         </Button>
       </div>
     );
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50">
@@ -497,7 +497,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         <Gift size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {currentUser.giftCards?.filter(card => card.recipientPhone === currentUser.phone).length || 0}
+                        {currentUser.giftCards?.length || 0}
                       </div>
                       <div className="text-sm text-gray-600">کارت هدیه دریافتی</div>
                     </CardContent>
@@ -509,7 +509,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         <CheckCircle size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {currentUser.giftCards?.filter(card => card.recipientPhone === currentUser.phone && card.status === 'active').length || 0}
+                        {currentUser.giftCards?.filter(card => card.status === 'active').length || 0}
                       </div>
                       <div className="text-sm text-gray-600">کارت فعال</div>
                     </CardContent>
@@ -521,7 +521,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         <Star size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {formatPrice(currentUser.giftCards?.filter(card => card.recipientPhone === currentUser.phone).reduce((sum, card) => sum + (card.totalValue || card.totalPrice || 0), 0) || 0)}
+                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.totalValue || card.totalPrice || 0), 0) || 0)}
                       </div>
                       <div className="text-sm text-gray-600">کل ارزش دریافتی (تومان)</div>
                     </CardContent>
@@ -613,16 +613,12 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                           ارسالی
                         </button>
                       </div>
-                      {searchQuery || filterType !== 'all' ? 'نتیجه‌ای یافت نشد' : 
-                       giftCardView === 'received' ? 'هنوز کارت هدیه‌ای دریافت نکرده‌اید' : 
-                       'هنوز کارت هدیه‌ای ارسال نکرده‌اید'}
+                    </div>
                     
                     <div className="text-sm text-gray-600">
                       {giftCardView === 'received' 
                         ? 'کارت‌های هدیه‌ای که دیگران برای شما خریده‌اند'
-                        : giftCardView === 'received' 
-                          ? 'کارت‌های هدیه دریافتی شما در اینجا نمایش داده می‌شود'
-                          : 'کارت‌های هدیه‌ای که برای دیگران خریده‌اید در اینجا نمایش داده می‌شود'
+                        : 'کارت‌های هدیه‌ای که برای دیگران خریده‌اید در اینجا نمایش داده می‌شود'
                       }
                     </div>
                   </CardContent>
@@ -632,12 +628,16 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                     <CardContent className="p-12 text-center">
                       <Gift size={64} className="mx-auto mb-4 text-gray-300" />
                       <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        {searchQuery || filterType !== 'all' ? 'نتیجه‌ای یافت نشد' : 'هنوز کارت هدیه‌ای دریافت نکرده‌اید'}
+                        {searchQuery || filterType !== 'all' ? 'نتیجه‌ای یافت نشد' : 
+                         giftCardView === 'received' ? 'هنوز کارت هدیه‌ای دریافت نکرده‌اید' : 
+                         'هنوز کارت هدیه‌ای ارسال نکرده‌اید'}
                       </h3>
                       <p className="text-gray-600">
                         {searchQuery || filterType !== 'all' 
                           ? 'فیلترها یا جستجو را تغییر دهید'
-                          : 'کارت‌های هدیه دریافتی شما در اینجا نمایش داده می‌شود'
+                          : giftCardView === 'received' 
+                            ? 'کارت‌های هدیه دریافتی شما در اینجا نمایش داده می‌شود'
+                            : 'کارت‌های هدیه ارسالی شما در اینجا نمایش داده می‌شود'
                         }
                       </p>
                     </CardContent>
