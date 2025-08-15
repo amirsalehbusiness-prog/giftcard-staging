@@ -497,7 +497,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         <Gift size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {currentUser.giftCards?.length || 0}
+                        {currentUser.giftCards?.filter(card => card.recipientPhone === currentUser.phone).length || 0}
                       </div>
                       <div className="text-sm text-gray-600">کارت هدیه دریافتی</div>
                     </CardContent>
@@ -509,7 +509,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         <CheckCircle size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {currentUser.giftCards?.filter(card => card.status === 'active').length || 0}
+                        {currentUser.giftCards?.filter(card => card.recipientPhone === currentUser.phone && card.status === 'active').length || 0}
                       </div>
                       <div className="text-sm text-gray-600">کارت فعال</div>
                     </CardContent>
@@ -521,7 +521,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                         <Star size={24} />
                       </div>
                       <div className="text-2xl font-bold text-gray-800">
-                        {formatPrice(currentUser.giftCards?.reduce((sum, card) => sum + (card.totalValue || card.totalPrice || 0), 0) || 0)}
+                        {formatPrice(currentUser.giftCards?.filter(card => card.recipientPhone === currentUser.phone).reduce((sum, card) => sum + (card.totalValue || card.totalPrice || 0), 0) || 0)}
                       </div>
                       <div className="text-sm text-gray-600">کل ارزش دریافتی (تومان)</div>
                     </CardContent>
