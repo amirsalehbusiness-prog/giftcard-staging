@@ -63,6 +63,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [filterType, setFilterType] = useState<FilterType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [giftCardView, setGiftCardView] = useState<'received' | 'sent'>('received');
 
   // Settings tab switches state
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -122,6 +123,19 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
     if (!currentUser?.giftCards) return [];
     
     let filtered = currentUser.giftCards;
+    
+    // Filter by view type (received vs sent)
+    if (giftCardView === 'received') {
+      // Show cards where current user is the recipient
+      filtered = filtered.filter(card => 
+        card.recipientPhone === currentUser.phone
+      );
+    } else if (giftCardView === 'sent') {
+      // Show cards where current user is the sender
+      filtered = filtered.filter(card => 
+        card.senderPhone === currentUser.phone
+      );
+    }
     
     // Apply filter
     switch (filterType) {
@@ -570,6 +584,49 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                 </Card>
 
                 {/* Gift Cards Display */}
+                {/* Gift Card View Tabs */}
+                <Card className="rounded-2xl">
+                  <CardContent className="p-4" style={{ paddingTop: '24px' }}>
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="font-semibold text-gray-800">نوع کارت‌های هدیه</h3>
+                      <div className="flex rounded-xl border border-gray-300 overflow-hidden">
+                        <button
+                          onClick={() => setGiftCardView('received')}
+                          className={`px-4 py-2 text-sm transition-colors ${
+                            giftCardView === 'received' 
+                              ? 'bg-[#0095da] text-white' 
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <Gift size={16} className="inline ml-1" />
+                          دریافتی
+                        </button>
+                        <button
+                          onClick={() => setGiftCardView('sent')}
+                          className={`px-4 py-2 text-sm transition-colors border-r border-gray-300 ${
+                            giftCardView === 'sent' 
+                              ? 'bg-[#0095da] text-white' 
+                              : 'bg-white text-gray-700 hover:bg-gray-50'
+                          }`}
+                        >
+                          <Gift size={16} className="inline ml-1" />
+                          ارسالی
+                        </button>
+                      </div>
+                      {searchQuery || filterType !== 'all' ? 'نتیجه‌ای یافت نشد' : 
+                       giftCardView === 'received' ? 'هنوز کارت هدیه‌ای دریافت نکرده‌اید' : 
+                       'هنوز کارت هدیه‌ای ارسال نکرده‌اید'}
+                    
+                    <div className="text-sm text-gray-600">
+                      {giftCardView === 'received' 
+                        ? 'کارت‌های هدیه‌ای که دیگران برای شما خریده‌اند'
+                        : giftCardView === 'received' 
+                          ? 'کارت‌های هدیه دریافتی شما در اینجا نمایش داده می‌شود'
+                          : 'کارت‌های هدیه‌ای که برای دیگران خریده‌اید در اینجا نمایش داده می‌شود'
+                      }
+                    </div>
+                  </CardContent>
+                </Card>
                 {filteredGiftCards.length === 0 ? (
                   <Card className="rounded-2xl">
                     <CardContent className="p-12 text-center">
