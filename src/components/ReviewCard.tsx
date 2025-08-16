@@ -380,30 +380,13 @@ export function ReviewCard({
               )}
             </Button>
           ) : 
-          /* اگر لاگین نباشد - دکمه اضافه به سبد خرید */
-          !loggedInUser && totalPrice > 0 && !paymentCompleted ? (
+          /* اگر لاگین نباشد یا کارت رایگان - دکمه اضافه به سبد خرید */
+          !loggedInUser && !paymentCompleted ? (
             <Button
               className="rounded-xl bg-[#ff4f00] hover:bg-[#e63900] text-white"
               onClick={handleAddToCart}
             >
               <ShoppingCart size={18} className="ml-1" /> اضافه به سبد خرید
-            </Button>
-          ) : 
-          /* کارت رایگان */
-          !paymentCompleted && totalPrice === 0 ? (
-            <Button
-              className="rounded-xl bg-[#0095da] hover:bg-[#0085ca] text-white"
-              onClick={loggedInUser ? () => onPaymentComplete?.() : handleLoginRedirect}
-            >
-              {loggedInUser ? (
-                <>
-                  <Share2 size={18} className="ml-1" /> دریافت کارت رایگان
-                </>
-              ) : (
-                <>
-                  <LogIn size={18} className="ml-1" /> ورود برای دریافت
-                </>
-              )}
             </Button>
           ) : 
           /* پرداخت تکمیل شده */
