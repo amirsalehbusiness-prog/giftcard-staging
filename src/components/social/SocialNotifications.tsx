@@ -280,12 +280,12 @@ export function SocialNotifications({ onBack }: SocialNotificationsProps) {
             </CardContent>
           </Card>
         ) : (
-          filteredNotifications.map((notification) => {
+          filteredNotifications.map((notification, index) => {
             const senderProfile = getSenderProfile(notification.fromUserId);
             
             return (
               <Card 
-                key={notification.id} 
+                key={`${notification.id}-${index}`} 
                 className={`rounded-2xl transition-all hover:shadow-md ${
                   !notification.isRead ? 'ring-2 ring-blue-200 bg-blue-50/30' : ''
                 }`}
