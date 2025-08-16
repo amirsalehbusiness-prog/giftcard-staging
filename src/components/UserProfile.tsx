@@ -43,6 +43,7 @@ import { SocialSetup } from './SocialSetup';
 import { CartManager } from './CartManager';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
+import { PreviewCard } from './PreviewCard';
 import type { GiftCard, CartItem } from '../types';
 import type { SavedDate } from '../types/calendar';
 
@@ -680,7 +681,45 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
 
             {/* Cart Tab */}
             {activeTab === 'cart' && (
-              <CartManager />
+              <div className="space-y-6">
+                <CartManager />
+                
+                {/* Show completed gift cards */}
+                {currentUser.giftCards && currentUser.giftCards.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Gift size={20} className="text-green-600" />
+                      <h3 className="text-lg font-semibold text-gray-800">کارت‌های هدیه تکمیل شده</h3>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {currentUser.giftCards
+                        .filter(card => card.isPaid)
+                        .slice(0, 3) // Show last 3 completed cards
+                        .map((giftCard) => (
+                          <div key={giftCard.id} className="max-w-md mx-auto">
+                            <PreviewCard
+                              occasion={giftCard.occasion || "birthday"}
+                              customOccasion={giftCard.customOccasion || ""}
+                              recipientName={giftCard.recipientName || ""}
+                              recipientPhone={giftCard.recipientPhone}
+                              senderPhone={giftCard.senderPhone}
+                              senderName={giftCard.senderName || ""}
+                              message={giftCard.message || ""}
+                              internet={giftCard.internet}
+                              voice={giftCard.voice}
+                              dkVoucher={giftCard.dkVoucher}
+                              ftVoucher={giftCard.ftVoucher}
+                              oneYear={giftCard.oneYear || false}
+                              totalPrice={giftCard.totalPrice || giftCard.totalValue || 0}
+                              isPaid={true}
+                            />
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Calendar Tab */}
