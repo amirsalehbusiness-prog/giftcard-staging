@@ -89,6 +89,28 @@ function AppContent() {
     setIsPaid(true);
   };
 
+  const handleLogout = () => {
+    setLoggedInUser(null);
+    // ریست کردن تمام اطلاعات ویزارد
+    setData({
+      occasion: "birthday",
+      customOccasion: "",
+      recipientName: "",
+      recipientPhone: null,
+      senderPhone: null,
+      senderName: "",
+      message: "تولدت مبارک! برات یک سال پر از شادی و حال خوب آرزو می‌کنم 🎉",
+      internet: null,
+      voice: null,
+      dkVoucher: null,
+      ftVoucher: null,
+      oneYear: true,
+    });
+    setStep(0);
+    setIsPaid(false);
+    setCurrentPage("home");
+  };
+
   // صفحه شبکه اجتماعی
   if (currentPage === "social") {
     return (
@@ -177,10 +199,7 @@ function AppContent() {
 
         <main className="mx-auto max-w-7xl px-4 py-6">
           <UserProfile 
-            onLogout={() => {
-              setLoggedInUser(null);
-              setCurrentPage("home");
-            }}
+            onLogout={handleLogout}
             onNavigateToSocial={() => setCurrentPage("social")}
           />
         </main>
