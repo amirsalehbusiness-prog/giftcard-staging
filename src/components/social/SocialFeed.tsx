@@ -42,6 +42,7 @@ type CompletedGiftCard = {
 };
 
 export function CartManager() {
+export function SocialFeed() {
   const { cartItems, removeFromCart, clearCart, createUserAccount, loggedInUser } = useUser();
   const { createSocialProfile, socialProfiles, createPost } = useSocial();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
