@@ -242,6 +242,27 @@ export function ReviewCard({
       oneYear,
       totalPrice,
     });
+    
+    // ایجاد حساب کاربری برای فرستنده اگر وجود نداشته باشد
+    if (senderPhone) {
+      const existingAccounts = JSON.parse(localStorage.getItem('userAccounts') || '[]');
+      const senderExists = existingAccounts.find((user: any) => user.phone === senderPhone);
+      
+      if (!senderExists) {
+        const newSenderAccount = {
+          id: Date.now().toString() + '_sender',
+          name: senderName || 'فرستنده',
+          phone: senderPhone,
+          password: senderPhone, // شماره موبایل به عنوان رمز عبور
+          giftCards: []
+        };
+        existingAccounts.push(newSenderAccount);
+        localStorage.setItem('userAccounts', JSON.stringify(existingAccounts));
+        
+        console.log('✅ Sender account created:', { phone: senderPhone, password: senderPhone });
+      }
+    }
+    
     setShowCartModal(true);
   };
 
