@@ -4,7 +4,7 @@ import { Gift, Menu, X } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { Badge } from "./components/ui/badge";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
-import { UserProvider } from "./contexts/UserContext";
+import { UserProvider, useUser } from "./contexts/UserContext";
 import { AdminProvider } from "./contexts/AdminContext";
 import { SocialProvider } from "./contexts/SocialContext";
 
