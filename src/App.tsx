@@ -202,12 +202,21 @@ function AppContent() {
 
           {/* Navigation */}
           <nav className="hidden lg:flex items-center gap-8">
-            <button
-              onClick={() => setCurrentPage("login")}
-              className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors"
-            >
-              ورود / ثبت‌نام
-            </button>
+            {loggedInUser ? (
+              <button
+                onClick={() => setCurrentPage("profile")}
+                className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors"
+              >
+                پروفایل کاربری
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrentPage("login")}
+                className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors"
+              >
+                ورود / ثبت‌نام
+              </button>
+            )}
             <a href="#" className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors">
               مقالات
             </a>
@@ -304,15 +313,27 @@ function AppContent() {
             </div>
 
             <nav className="space-y-1">
-              <button
-                className="w-full text-right px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50"
-                onClick={() => {
-                  setCurrentPage("login");
-                  setMobileMenuOpen(false);
-                }}
-              >
-                ورود / ثبت‌نام
-              </button>
+              {loggedInUser ? (
+                <button
+                  className="w-full text-right px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50"
+                  onClick={() => {
+                    setCurrentPage("profile");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  پروفایل کاربری
+                </button>
+              ) : (
+                <button
+                  className="w-full text-right px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50"
+                  onClick={() => {
+                    setCurrentPage("login");
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  ورود / ثبت‌نام
+                </button>
+              )}
               <a href="#" className="block px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50" onClick={() => setMobileMenuOpen(false)}>
                 مقالات
               </a>

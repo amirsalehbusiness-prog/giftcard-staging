@@ -220,11 +220,6 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
               </div>
             </div>
             <Button onClick={onLogout} variant="outline" className="rounded-xl">
-            {/* Cart Tab */}
-            {activeTab === 'cart' && (
-              <CartManager />
-            )}
-
               <LogOut size={18} className="ml-2" />
               خروج
             </Button>
@@ -681,6 +676,11 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                   </div>
                 )}
               </div>
+            )}
+
+            {/* Cart Tab */}
+            {activeTab === 'cart' && (
+              <CartManager />
             )}
 
             {/* Calendar Tab */}
