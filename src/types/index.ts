@@ -109,3 +109,22 @@ export type GiftCard = {
   createdAt?: string;
   vouchers: Voucher[]; // ← در 
   };
+
+// Cart item for shopping cart
+export type CartItem = {
+  id: string;
+  occasion: string;
+  customOccasion: string;
+  recipientName: string;
+  recipientPhone: string | null;
+  senderPhone: string | null;
+  senderName: string;
+  message: string;
+  internet: string | null;
+  voice: string | null;
+  dkVoucher: string | null;
+  ftVoucher: string | null;
+  oneYear: boolean;
+  totalPrice: number;
+  createdAt: string;
+};

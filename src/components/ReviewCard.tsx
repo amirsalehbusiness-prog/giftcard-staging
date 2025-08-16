@@ -1,6 +1,6 @@
 import React from "react";
-import { ChevronRight, Share2, CreditCard } from "lucide-react";
-import { Gift, User, LogIn } from "lucide-react";
+import { ChevronRight, Share2, CreditCard, ShoppingCart, LogIn } from "lucide-react";
+import { Gift, User } from "lucide-react";
 import { Button } from "./ui/button";
 import { useSocial } from "../contexts/SocialContext";
 import { useUser } from "../contexts/UserContext";
@@ -53,10 +53,9 @@ export function ReviewCard({
 }: ReviewCardProps) {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(isPaid);
-  const [showSenderProfilePrompt, setShowSenderProfilePrompt] = useState(false);
-  const [senderProfileCreated, setSenderProfileCreated] = useState(false);
+  const [showCartModal, setShowCartModal] = useState(false);
   const { createSocialProfile, socialProfiles, createPost } = useSocial();
-  const { createUserAccount } = useUser();
+  const { createUserAccount, loggedInUser, addToCart } = useUser();
 
   // هم‌راستا کردن وضعیت داخلی با prop
   React.useEffect(() => {
@@ -206,16 +205,10 @@ export function ReviewCard({
 
       savedRef.current = true; // فقط یک‌بار ذخیره کند
       
-      // نمایش پرامپت برای فرستنده (اگر شماره فرستنده وجود داشته باشد)
-      if (senderPhone && senderPhone !== recipientPhone) {
-        setTimeout(() => {
-          setShowSenderProfilePrompt(true);
-        }, 2000);
-      }
     } catch (e) {
       console.warn("localStorage update error:", e);
     }
-  }, [paymentCompleted, recipientPhone, senderPhone]);
+  }, [paymentCompleted, recipientPhone]);
 
   const getOccasionLabel = (occasion: string) => {
     if (occasion === "custom") return customOccasion || "بهانه دلخواه";
@@ -233,12 +226,8 @@ export function ReviewCard({
     onPaymentComplete?.();
   };
 
-  const handleCreateSenderProfile = () => {
-    if (!senderPhone) return;
-    
-    // ایجاد حساب کاربری برای فرستنده
-    createUserAccount(senderPhone, {
-      id: `sender_${Date.now()}`,
+  const handleAddToCart = () => {
+    addToCart({
       occasion,
       customOccasion,
       recipientName,
@@ -252,28 +241,14 @@ export function ReviewCard({
       ftVoucher,
       oneYear,
       totalPrice,
-      totalValue: totalPrice,
-      isPaid: true,
-      createdAt: new Date().toISOString(),
-      status: 'active',
-      vouchers: []
     });
-    
-    // ایجاد پروفایل اجتماعی برای فرستنده
-    const existingSocialProfile = socialProfiles.find(p => p.userId === senderPhone);
-    if (!existingSocialProfile) {
-      createSocialProfile(senderPhone, {
-        displayName: senderName || 'کاربر جدید',
-        username: `user_${senderPhone.slice(-6)}`,
-        showGiftStats: true,
-        showInterests: true,
-        showBirthday: true
-      });
-    }
-    
-    setSenderProfileCreated(true);
-    setShowSenderProfilePrompt(false);
+    setShowCartModal(true);
   };
+
+  const handleLoginRedirect = () => {
+    window.dispatchEvent(new CustomEvent('navigateToLogin'));
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -381,108 +356,13 @@ export function ReviewCard({
           </div>
         )}
 
-        {/* پرامپت ایجاد پروفایل برای فرستنده */}
-        {showSenderProfilePrompt && senderPhone && (
-          <div className="rounded-2xl border bg-gradient-to-r from-purple-50 to-pink-50 p-6 border-purple-200">
-            <div className="text-center mb-4">
-              <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white mx-auto mb-3">
-                <User size={24} />
-              </div>
-              <div className="text-purple-800 font-semibold mb-2">
-                🎁 ایجاد حساب کاربری برای مدیریت هدایا
-              </div>
-              <div className="text-sm text-purple-700 leading-6">
-                برای مدیریت کارت‌های هدیه‌ای که می‌دهید و احتمال دریافت هدیه در آینده، 
-                می‌خواهید حساب کاربری داشته باشید؟
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl p-4 mb-4 border border-purple-200">
-              <div className="text-sm text-gray-700 mb-3">
-                <strong>اطلاعات ورود شما:</strong>
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">نام کاربری:</span>
-                  <span className="font-mono font-semibold text-purple-800">
-                    {senderPhone}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">رمز عبور:</span>
-                  <span className="font-mono font-semibold text-purple-800">
-                    {senderPhone}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex gap-3">
-              <Button
-                onClick={handleCreateSenderProfile}
-                className="flex-1 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white"
-              >
-                <User size={18} className="ml-2" />
-                بله، حساب کاربری ایجاد کن
-              </Button>
-              <Button
-                onClick={() => setShowSenderProfilePrompt(false)}
-                variant="outline"
-                className="flex-1 rounded-xl border-purple-200 text-purple-700"
-              >
-                فعلاً نه، ممنون
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {/* نمایش اطلاعات ورود و دکمه لاگین برای فرستنده */}
-        {senderProfileCreated && senderPhone && (
-          <div className="rounded-2xl border bg-gradient-to-r from-green-50 to-emerald-50 p-6 border-green-200">
-            <div className="text-center mb-4">
-              <div className="text-green-600 font-semibold mb-2">
-                ✅ حساب کاربری شما با موفقیت ایجاد شد
-              </div>
-              <div className="text-sm text-green-700">
-                حالا می‌توانید وارد حساب کاربری خود شوید
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl p-4 mb-4 border border-green-200">
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">نام کاربری:</span>
-                  <span className="font-mono font-semibold text-green-800">
-                    {senderPhone}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-600">رمز عبور:</span>
-                  <span className="font-mono font-semibold text-green-800">
-                    {senderPhone}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <Button
-              onClick={() => {
-                // انتقال به صفحه لاگین
-                window.dispatchEvent(new CustomEvent('navigateToLogin'));
-              }}
-              className="w-full rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white"
-            >
-              <LogIn size={18} className="ml-2" />
-              ورود به حساب کاربری
-            </Button>
-          </div>
-        )}
         <div className="flex items-center justify-between gap-3">
           <Button variant="outline" className="rounded-xl" onClick={onPrevious}>
             <ChevronRight className="ml-1" size={18} /> قبلی
           </Button>
 
-          {totalPrice > 0 && !paymentCompleted ? (
+          {/* اگر لاگین باشد - دکمه پرداخت */}
+          {loggedInUser && totalPrice > 0 && !paymentCompleted ? (
             <Button
               className="rounded-xl bg-[#0095da] hover:bg-[#0085ca] text-white"
               onClick={handlePayment}
@@ -499,19 +379,60 @@ export function ReviewCard({
                 </>
               )}
             </Button>
-          ) : !paymentCompleted && totalPrice === 0 ? (
+          ) : 
+          /* اگر لاگین نباشد - دکمه اضافه به سبد خرید */
+          !loggedInUser && totalPrice > 0 && !paymentCompleted ? (
+            <Button
+              className="rounded-xl bg-[#ff4f00] hover:bg-[#e63900] text-white"
+              onClick={handleAddToCart}
+            >
+              <ShoppingCart size={18} className="ml-1" /> اضافه به سبد خرید
+            </Button>
+          ) : 
+          /* کارت رایگان */
+          !paymentCompleted && totalPrice === 0 ? (
             <Button
               className="rounded-xl bg-[#0095da] hover:bg-[#0085ca] text-white"
-              onClick={() => onPaymentComplete?.()}
+              onClick={loggedInUser ? () => onPaymentComplete?.() : handleLoginRedirect}
             >
-              <Share2 size={18} className="ml-1" /> دریافت کارت رایگان
+              {loggedInUser ? (
+                <>
+                  <Share2 size={18} className="ml-1" /> دریافت کارت رایگان
+                </>
+              ) : (
+                <>
+                  <LogIn size={18} className="ml-1" /> ورود برای دریافت
+                </>
+              )}
             </Button>
-          ) : paymentCompleted ? (
+          ) : 
+          /* پرداخت تکمیل شده */
+          paymentCompleted ? (
             <div className="text-sm text-green-600 font-medium">
               {isPaid ? "اشتراک گذاری کارت هدیه فعال شد." : "در حال فعال‌سازی دکمه اشتراک..."}
             </div>
           ) : null}
         </div>
+
+        {/* راهنمایی برای کاربران غیر لاگین */}
+        {!loggedInUser && (
+          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-2xl text-center">
+            <div className="text-blue-800 font-semibold mb-2">
+              💡 برای تکمیل خرید و اشتراک‌گذاری کارت هدیه
+            </div>
+            <div className="text-sm text-blue-700 mb-3">
+              خرید خود را با ثبت‌نام تکمیل کنید
+            </div>
+            <Button
+              onClick={handleLoginRedirect}
+              variant="outline"
+              className="rounded-xl border-blue-300 text-blue-700 hover:bg-blue-100"
+            >
+              <LogIn size={16} className="ml-2" />
+              ورود / ثبت‌نام
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* دکمه ساخت کارت جدید */}
@@ -530,6 +451,46 @@ export function ReviewCard({
             سفارش کارت هدیه جدید
           </Button>
         </div>
+      )}
+
+      {/* Cart Modal */}
+      {showCartModal && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black/50 z-[100]"
+            onClick={() => setShowCartModal(false)}
+          />
+          
+          <div className="fixed inset-0 z-[101] flex items-center justify-center p-4">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6">
+              <div className="text-center mb-6">
+                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-[#ff4f00] to-[#ff6b35] flex items-center justify-center text-white mx-auto mb-4">
+                  <ShoppingCart size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-2">✅ به سبد خرید اضافه شد</h3>
+                <p className="text-gray-600">کارت هدیه شما به سبد خرید اضافه شد</p>
+              </div>
+              
+              <div className="space-y-3">
+                <Button
+                  onClick={handleLoginRedirect}
+                  className="w-full rounded-2xl bg-gradient-to-r from-[#0095da] to-[#ff4f00] text-white py-3"
+                >
+                  <LogIn size={18} className="ml-2" />
+                  ورود به سبد خرید
+                </Button>
+                
+                <Button
+                  onClick={() => setShowCartModal(false)}
+                  variant="outline"
+                  className="w-full rounded-2xl"
+                >
+                  ادامه خرید
+                </Button>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </>
   );

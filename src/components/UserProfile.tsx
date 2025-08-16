@@ -39,9 +39,10 @@ import { PersianDatePicker } from './PersianDatePicker';
 import { GiftCardDetails } from './GiftCardDetails';
 import { UserInterestsManager } from './UserInterestsManager.tsx';
 import { SocialSetup } from './SocialSetup';
+import { CartManager } from './CartManager';
 import { formatPrice } from '../utils/pricing';
 import { OCCASIONS } from '../data/occasions';
-import type { GiftCard } from '../types';
+import type { GiftCard, CartItem } from '../types';
 import type { SavedDate } from '../types/calendar';
 
 type UserProfileProps = {
@@ -53,10 +54,10 @@ type ViewMode = 'grid' | 'list';
 type FilterType = 'all' | 'active' | 'used' | 'expired';
 
 export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) {
-  const { userAccounts, loggedInUser, updateUserAccount } = useUser();
+  const { userAccounts, loggedInUser, updateUserAccount, cartItems } = useUser();
   const [savedDates, setSavedDates] = useLocalStorage<SavedDate[]>('savedDates', []);
   
-  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'calendar' | 'social' | 'settings'>('giftCards');
+  const [activeTab, setActiveTab] = useState<'profile' | 'giftCards' | 'cart' | 'calendar' | 'social' | 'settings'>('giftCards');
   const [isEditing, setIsEditing] = useState(false);
   const [showPersonalInfo, setShowPersonalInfo] = useState(true);
   const [showInterests, setShowInterests] = useState(false);
@@ -218,6 +219,11 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
               </div>
             </div>
             <Button onClick={onLogout} variant="outline" className="rounded-xl">
+            {/* Cart Tab */}
+            {activeTab === 'cart' && (
+              <CartManager />
+            )}
+
               <LogOut size={18} className="ml-2" />
               خروج
             </Button>
@@ -245,6 +251,23 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
                     {currentUser.giftCards?.length > 0 && (
                       <Badge className="rounded-full bg-orange-100 text-orange-800 text-xs">
                         {currentUser.giftCards.length}
+                      </Badge>
+                    )}
+                  </button>
+                  
+                  <button
+                    onClick={() => setActiveTab('cart')}
+                    className={`w-full flex items-center gap-3 px-3 py-3 mx-1 rounded-xl transition-all ${
+                      activeTab === 'cart' 
+                        ? 'bg-[#0095da] text-white' 
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <ShoppingCart size={20} />
+                    <span>سبد خرید</span>
+                    {cartItems.length > 0 && (
+                      <Badge className="rounded-full bg-red-100 text-red-800 text-xs">
+                        {cartItems.length}
                       </Badge>
                     )}
                   </button>

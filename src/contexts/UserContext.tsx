@@ -1,14 +1,19 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import type { UserAccount } from '../types';
+import type { UserAccount, CartItem } from '../types';
 
 type UserContextType = {
   userAccounts: UserAccount[];
   setUserAccounts: (accounts: UserAccount[] | ((prev: UserAccount[]) => UserAccount[])) => void;
   loggedInUser: string | null;
   setLoggedInUser: (user: string | null) => void;
+  cartItems: CartItem[];
+  setCartItems: (items: CartItem[] | ((prev: CartItem[]) => CartItem[])) => void;
   createUserAccount: (phone: string, giftCard: any) => void;
   updateUserAccount: (phone: string, updates: Partial<UserAccount>) => void;
+  addToCart: (item: Omit<CartItem, 'id' | 'createdAt'>) => void;
+  removeFromCart: (itemId: string) => void;
+  clearCart: () => void;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -16,6 +21,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [userAccounts, setUserAccounts] = useLocalStorage<UserAccount[]>('userAccounts', []);
   const [loggedInUser, setLoggedInUser] = useLocalStorage<string | null>('loggedInUser', null);
+  const [cartItems, setCartItems] = useLocalStorage<CartItem[]>('cartItems', []);
 
   const createUserAccount = (phone: string, giftCard: any) => {
     const existingUserIndex = userAccounts.findIndex(user => user.phone === phone);
@@ -51,14 +57,36 @@ export function UserProvider({ children }: { children: ReactNode }) {
     );
   };
 
+  const addToCart = (item: Omit<CartItem, 'id' | 'createdAt'>) => {
+    const newItem: CartItem = {
+      ...item,
+      id: Date.now().toString(),
+      createdAt: new Date().toISOString()
+    };
+    setCartItems(prev => [...prev, newItem]);
+  };
+
+  const removeFromCart = (itemId: string) => {
+    setCartItems(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+  };
+
   return (
     <UserContext.Provider value={{
       userAccounts,
       setUserAccounts,
       loggedInUser,
       setLoggedInUser,
+      cartItems,
+      setCartItems,
       createUserAccount,
-      updateUserAccount
+      updateUserAccount,
+      addToCart,
+      removeFromCart,
+      clearCart
     }}>
       {children}
     </UserContext.Provider>

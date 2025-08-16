@@ -15,6 +15,7 @@ import { UserProfile } from "./components/UserProfile";
 import { AdminLogin } from "./components/admin/AdminLogin";
 import { AdminDashboard } from "./components/admin/AdminDashboard";
 import { SocialLayout } from "./components/social/SocialLayout";
+import { CartIndicator } from "./components/CartIndicator";
 
 import { OCCASIONS } from "./data/occasions";
 import { calculateTotalPrice } from "./utils/pricing";
@@ -28,6 +29,7 @@ function AppContent() {
   const [step, setStep] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isPaid, setIsPaid] = useState<boolean>(false);
+  const { loggedInUser, cartItems } = useUser();
 
   // Event listener برای انتقال به صفحه لاگین از ReviewCard
   React.useEffect(() => {
@@ -35,8 +37,18 @@ function AppContent() {
       setCurrentPage("login");
     };
 
+    const handleNavigateToProfile = (event: any) => {
+      setCurrentPage("profile");
+      // TODO: Pass tab info to UserProfile component if needed
+    };
+
     window.addEventListener('navigateToLogin', handleNavigateToLogin);
-    return () => window.removeEventListener('navigateToLogin', handleNavigateToLogin);
+    window.addEventListener('navigateToProfile', handleNavigateToProfile);
+    
+    return () => {
+      window.removeEventListener('navigateToLogin', handleNavigateToLogin);
+      window.removeEventListener('navigateToProfile', handleNavigateToProfile);
+    };
   }, []);
   const [data, setData] = useState<WizardData>({
     occasion: "birthday",
@@ -230,6 +242,9 @@ function AppContent() {
             <Button variant="outline" className="rounded-xl">
               راهنما
             </Button>
+
+            {/* Cart Indicator */}
+            <CartIndicator />
 
             {/* Debug */}
             <Button
