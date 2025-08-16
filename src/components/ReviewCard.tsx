@@ -13,6 +13,7 @@ import {
 } from "../data/packages";
 import { formatPrice } from "../utils/pricing";
 import { useState } from "react";
+import { generateUniqueId } from "../lib/utils";
 
 type ReviewCardProps = {
   occasion: string;
@@ -85,7 +86,7 @@ export function ReviewCard({
       
       // Create gift card data
       const giftCardData = {
-        id: Date.now().toString(),
+        id: generateUniqueId(),
         occasion,
         customOccasion,
         recipientName,
@@ -106,25 +107,25 @@ export function ReviewCard({
         receivedDate: new Date().toLocaleDateString('fa-IR'),
         vouchers: [
           ...(internet ? [{
-            id: `internet_${Date.now()}`,
+            id: `internet_${generateUniqueId()}`,
             type: 'internet',
             amount: INTERNET_PACKS.find(p => p.id === internet)?.label + ' گیگ',
             used: false
           }] : []),
           ...(voice ? [{
-            id: `voice_${Date.now()}`,
+            id: `voice_${generateUniqueId()}`,
             type: 'voice', 
             amount: VOICE_PACKS.find(p => p.id === voice)?.label,
             used: false
           }] : []),
           ...(dkVoucher ? [{
-            id: `dk_${Date.now()}`,
+            id: `dk_${generateUniqueId()}`,
             type: 'digikala',
             amount: DIGIKALA_VOUCHERS.find(p => p.id === dkVoucher)?.label,
             used: false
           }] : []),
           ...(ftVoucher ? [{
-            id: `ft_${Date.now()}`,
+            id: `ft_${generateUniqueId()}`,
             type: 'flytoday',
             amount: FLYTODAY_VOUCHERS.find(p => p.id === ftVoucher)?.label,
             used: false
@@ -147,7 +148,7 @@ export function ReviewCard({
         } else {
           // Create new user account
           const newAccount = {
-            id: Date.now().toString(),
+            id: generateUniqueId(),
             name: accountInfo.name,
             phone: accountInfo.phone,
             password: accountInfo.phone, // Use phone number as password
@@ -250,7 +251,7 @@ export function ReviewCard({
       
       if (!senderExists) {
         const newSenderAccount = {
-          id: Date.now().toString() + '_sender',
+          id: generateUniqueId(),
           name: senderName || 'فرستنده',
           phone: senderPhone,
           password: senderPhone, // شماره موبایل به عنوان رمز عبور

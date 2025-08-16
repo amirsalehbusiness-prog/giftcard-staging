@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { UserAccount, CartItem } from '../types';
+import { generateUniqueId } from '../lib/utils';
 
 type UserContextType = {
   userAccounts: UserAccount[];
@@ -34,7 +35,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
     } else {
       // Create new user account
       const newAccount: UserAccount = {
-        id: Date.now().toString(), // or use a better unique id generator if available
+        id: generateUniqueId(),
         name: '', // or prompt for name, or set a default
         phone,
         password: phone, // Use phone number as password
@@ -60,7 +61,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const addToCart = (item: Omit<CartItem, 'id' | 'createdAt'>) => {
     const newItem: CartItem = {
       ...item,
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       createdAt: new Date().toISOString()
     };
     setCartItems(prev => [...prev, newItem]);

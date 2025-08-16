@@ -6,6 +6,7 @@ import { Textarea } from './ui/textarea';
 import { Switch } from './ui/switch';
 import type { SavedDate } from '../types/calendar';
 import { formatPersianNumber } from '../utils/persianCalendar';
+import { generateUniqueId } from '../lib/utils';
 
 type AddDateModalProps = {
   selectedDate: { year?: number; month: number; day: number };

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, ReactNode, useEffect } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
+import { generateUniqueId } from '../lib/utils';
 import type { 
   SocialProfile, 
   SocialPost, 
@@ -171,7 +172,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
 
   const createSocialProfile = (userId: string, profileData: Partial<SocialProfile>) => {
     const newProfile: SocialProfile = {
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       userId,
       username: profileData.username || `user_${userId.slice(-6)}`,
       displayName: profileData.displayName || 'کاربر جدید',
@@ -215,7 +216,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
   const createPost = (postData: Omit<SocialPost, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newPost: SocialPost = {
       ...postData,
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       likes: [],
       comments: [],
       shares: [],
@@ -263,7 +264,7 @@ export function SocialProvider({ children }: { children: ReactNode }) {
     if (targetProfile?.isPrivate) {
       // Create follow request for private accounts
       const newRequest: FollowRequest = {
-        id: Date.now().toString(),
+        id: generateUniqueId(),
         fromUserId,
         toUserId,
         status: 'pending',

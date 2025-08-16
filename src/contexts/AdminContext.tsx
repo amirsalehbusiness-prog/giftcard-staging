@@ -1,6 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import type { AdminUser, BusinessPartner, AnalyticsData } from '../types/admin';
+import { generateUniqueId } from '../lib/utils';
 
 type AdminContextType = {
   adminUsers: AdminUser[];
@@ -50,7 +51,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const createAdminUser = (userData: Omit<AdminUser, 'id' | 'createdAt'>) => {
     const newUser: AdminUser = {
       ...userData,
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       createdAt: new Date().toISOString()
     };
     setAdminUsers(prev => [...prev, newUser]);
@@ -71,7 +72,7 @@ export function AdminProvider({ children }: { children: ReactNode }) {
   const createBusinessPartner = (partnerData: Omit<BusinessPartner, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newPartner: BusinessPartner = {
       ...partnerData,
-      id: Date.now().toString(),
+      id: generateUniqueId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
