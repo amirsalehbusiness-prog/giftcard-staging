@@ -240,12 +240,6 @@ function AppContent() {
               </button>
             )}
             <a href="#" className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors">
-              مقالات
-            </a>
-            <a href="#" className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors">
-              تعامل کاربران
-            </a>
-            <a href="#" className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors">
               درباره ما
             </a>
             <a href="#" className="text-sm font-medium text-neutral-700 hover:text-[#0095da] transition-colors">
@@ -356,12 +350,6 @@ function AppContent() {
                   ورود / ثبت‌نام
                 </button>
               )}
-              <a href="#" className="block px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50" onClick={() => setMobileMenuOpen(false)}>
-                مقالات
-              </a>
-              <a href="#" className="block px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50" onClick={() => setMobileMenuOpen(false)}>
-                تعامل کاربران
-              </a>
               <a href="#" className="block px-4 py-3 text-sm font-medium text-neutral-800 hover:text-[#0095da] hover:bg-white rounded-xl transition-all duration-200 bg-gray-50" onClick={() => setMobileMenuOpen(false)}>
                 درباره ما
               </a>
