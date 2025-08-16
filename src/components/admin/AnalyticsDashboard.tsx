@@ -295,10 +295,10 @@ export function AnalyticsDashboard() {
         <CardContent>
           <div className="space-y-4">
             {analyticsData.topBusinessPartners.map((partner, index) => (
-              <div key={`${partner.name}-${index}`} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div key={partner.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                    {analyticsData.topBusinessPartners.indexOf(partner) + 1}
+                    {index + 1}
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">{partner.name}</div>
