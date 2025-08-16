@@ -15,7 +15,7 @@ import { UserProfile } from "./components/UserProfile";
 import { AdminLogin } from "./components/admin/AdminLogin";
 import { AdminDashboard } from "./components/admin/AdminDashboard";
 import { SocialLayout } from "./components/social/SocialLayout";
-import { CartIndicator } from "./components/CartIndicator";
+import { CartIndicator } from "./components/CartIndicator.tsx";
 
 import { OCCASIONS } from "./data/occasions";
 import { calculateTotalPrice } from "./utils/pricing";
