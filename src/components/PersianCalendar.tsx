@@ -319,7 +319,7 @@ export function PersianCalendar({ userPhone, savedDates, onSaveDates }: PersianC
 
               return (
                 <button
-                  key={index}
+                  key={day ? `${currentDate.year}-${currentDate.month}-${day}` : `empty-${index}`}
                   onClick={() => handleDateClick(day)}
                   className={`
                     relative p-2 text-sm rounded-xl transition-all hover:bg-blue-50 hover:scale-105 min-h-[40px] flex flex-col items-center justify-center

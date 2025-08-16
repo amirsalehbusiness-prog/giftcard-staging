@@ -295,8 +295,8 @@ export function SocialExplore({ onBack }: SocialExploreProps) {
 
                     {searchType === 'hashtags' && (
                       <div className="space-y-3">
-                        {searchResults.map((hashtag: any, index) => (
-                          <div key={index} className="flex items-center justify-between p-4 border rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer">
+                        {searchResults.map((hashtag: any) => (
+                          <div key={hashtag.tag} className="flex items-center justify-between p-4 border rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer">
                             <div className="flex items-center gap-3">
                               <Hash size={20} className="text-blue-500" />
                               <div>

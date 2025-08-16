@@ -322,9 +322,9 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
               <div>
                 <div className="text-sm font-medium text-gray-700 mb-2">لینک‌های مفید</div>
                 <div className="flex flex-wrap gap-2">
-                  {giftCard.vouchers?.map((voucher, index) => (
+                  {giftCard.vouchers?.map((voucher) => (
                     <Button
-                      key={index}
+                      key={voucher.id || voucher.type}
                       variant="outline"
                       className="rounded-xl text-xs"
                       onClick={() => window.open(getVoucherLink(voucher.type || ''), '_blank')}

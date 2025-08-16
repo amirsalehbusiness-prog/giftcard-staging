@@ -220,7 +220,7 @@ export function AnalyticsDashboard() {
                 const height = (item.amount / maxAmount) * 200;
                 
                 return (
-                  <div key={index} className="flex flex-col items-center gap-2 flex-1">
+                  <div key={(item as any).date || (item as any).week || (item as any).month || index} className="flex flex-col items-center gap-2 flex-1">
                     <div className="text-xs text-gray-600 text-center">
                       {formatPrice(item.amount)}
                     </div>
@@ -253,14 +253,14 @@ export function AnalyticsDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {analyticsData.voucherSales.map((voucher, index) => {
+              {analyticsData.voucherSales.map((voucher) => {
                 const totalSales = analyticsData.voucherSales.reduce((sum, v) => sum + v.amount, 0);
                 const percentage = (voucher.amount / totalSales) * 100;
                 
                 const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500'];
                 
                 return (
-                  <div key={index} className="space-y-2">
+                  <div key={voucher.voucherType} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-full ${colors[index % colors.length]}`} />
@@ -272,7 +272,7 @@ export function AnalyticsDashboard() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className={`h-2 rounded-full ${colors[index % colors.length]}`}
+                        className={`h-2 rounded-full ${colors[analyticsData.voucherSales.indexOf(voucher) % colors.length]}`}
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -294,11 +294,11 @@ export function AnalyticsDashboard() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {analyticsData.topBusinessPartners.map((partner, index) => (
-              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+            {analyticsData.topBusinessPartners.map((partner) => (
+              <div key={partner.name} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold">
-                    {index + 1}
+                    {analyticsData.topBusinessPartners.indexOf(partner) + 1}
                   </div>
                   <div>
                     <div className="font-semibold text-gray-800">{partner.name}</div>
