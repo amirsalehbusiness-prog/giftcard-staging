@@ -24,7 +24,8 @@ import {
   Search,
   Grid,
   List,
-  MoreVertical
+  MoreVertical,
+  ShoppingCart
 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
