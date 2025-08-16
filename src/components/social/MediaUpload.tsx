@@ -248,8 +248,8 @@ export function MediaUpload({
           </div>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {files.map((file) => (
-              <div key={file.id} className="relative group">
+            {files.map((file, index) => (
+              <div key={`${file.id}-${index}`} className="relative group">
                 <div className="aspect-square rounded-2xl overflow-hidden bg-gray-100 border border-gray-200">
                   {file.type === 'image' ? (
                     <img

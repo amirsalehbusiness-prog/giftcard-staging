@@ -148,7 +148,7 @@ export function ReviewCard({
         } else {
           // Create new user account
           const newAccount = {
-            id: generateUniqueId(),
+            id: `user-${generateUniqueId()}`,
             name: accountInfo.name,
             phone: accountInfo.phone,
             password: accountInfo.phone, // Use phone number as password

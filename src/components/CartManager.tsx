@@ -65,7 +65,7 @@ export function CartManager() {
       
       // ایجاد کارت هدیه
       const giftCardData = {
-        id: Date.now().toString(),
+        id: `gift-${generateUniqueId()}`,
         occasion: item.occasion,
         customOccasion: item.customOccasion,
         recipientName: item.recipientName,
