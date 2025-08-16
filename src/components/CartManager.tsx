@@ -19,13 +19,34 @@ import { useSocial } from '../contexts/SocialContext';
 import { OCCASIONS } from '../data/occasions';
 import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS } from '../data/packages';
 import { formatPrice } from '../utils/pricing';
+import { PreviewCard } from './PreviewCard';
 import type { CartItem } from '../types';
+
+type CompletedGiftCard = {
+  id: string;
+  occasion: string;
+  customOccasion: string;
+  recipientName: string;
+  recipientPhone: string | null;
+  senderPhone: string | null;
+  senderName: string;
+  message: string;
+  internet: string | null;
+  voice: string | null;
+  dkVoucher: string | null;
+  ftVoucher: string | null;
+  oneYear: boolean;
+  totalPrice: number;
+  isPaid: boolean;
+  createdAt: string;
+};
 
 export function CartManager() {
   const { cartItems, removeFromCart, clearCart, createUserAccount, loggedInUser } = useUser();
   const { createSocialProfile, socialProfiles, createPost } = useSocial();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
+  const [completedGiftCards, setCompletedGiftCards] = useState<CompletedGiftCard[]>([]);
 
   const totalCartValue = cartItems.reduce((sum, item) => sum + item.totalPrice, 0);
 
@@ -134,6 +155,27 @@ export function CartManager() {
 
       // علامت‌گذاری به عنوان تکمیل شده
       setCompletedItems(prev => new Set([...prev, item.id]));
+      
+      // اضافه کردن به لیست کارت‌های تکمیل شده برای نمایش
+      const completedCard: CompletedGiftCard = {
+        id: giftCardData.id,
+        occasion: item.occasion,
+        customOccasion: item.customOccasion,
+        recipientName: item.recipientName,
+        recipientPhone: item.recipientPhone,
+        senderPhone: item.senderPhone,
+        senderName: item.senderName,
+        message: item.message,
+        internet: item.internet,
+        voice: item.voice,
+        dkVoucher: item.dkVoucher,
+        ftVoucher: item.ftVoucher,
+        oneYear: item.oneYear,
+        totalPrice: item.totalPrice,
+        isPaid: true,
+        createdAt: giftCardData.createdAt
+      };
+      setCompletedGiftCards(prev => [...prev, completedCard]);
       
       // حذف از سبد خرید
       setTimeout(() => {
@@ -365,6 +407,52 @@ export function CartManager() {
               </Card>
             );
           })}
+        </div>
+      )}
+
+      {/* Show completed gift cards for sharing */}
+      {completedGiftCards.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Gift size={20} className="text-green-600" />
+            <h3 className="text-lg font-semibold text-gray-800">کارت‌های هدیه تکمیل شده</h3>
+            <Badge className="rounded-xl bg-green-100 text-green-800">
+              آماده اشتراک‌گذاری
+            </Badge>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {completedGiftCards.slice(-3).map((giftCard) => (
+              <div key={`completed-${giftCard.id}`} className="max-w-md mx-auto">
+                <PreviewCard
+                  occasion={giftCard.occasion}
+                  customOccasion={giftCard.customOccasion}
+                  recipientName={giftCard.recipientName}
+                  recipientPhone={giftCard.recipientPhone}
+                  senderPhone={giftCard.senderPhone}
+                  senderName={giftCard.senderName}
+                  message={giftCard.message}
+                  internet={giftCard.internet}
+                  voice={giftCard.voice}
+                  dkVoucher={giftCard.dkVoucher}
+                  ftVoucher={giftCard.ftVoucher}
+                  oneYear={giftCard.oneYear}
+                  totalPrice={giftCard.totalPrice}
+                  isPaid={true}
+                />
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center">
+            <Button
+              onClick={() => setCompletedGiftCards([])}
+              variant="outline"
+              className="rounded-xl text-gray-600"
+            >
+              پاک کردن کارت‌های نمایش داده شده
+            </Button>
+          </div>
         </div>
       )}
 

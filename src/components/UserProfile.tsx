@@ -691,42 +691,6 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
             {activeTab === 'cart' && (
               <div className="space-y-6">
                 <CartManager />
-                
-                {/* Show completed gift cards */}
-                {currentUser.giftCards && currentUser.giftCards.length > 0 && (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Gift size={20} className="text-green-600" />
-                      <h3 className="text-lg font-semibold text-gray-800">کارت‌های هدیه تکمیل شده</h3>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      {currentUser.giftCards
-                        .filter(card => card.isPaid)
-                        .slice(0, 3) // Show last 3 completed cards
-                        .map((giftCard) => (
-                          <div key={giftCard.id} className="max-w-md mx-auto">
-                            <PreviewCard
-                              occasion={giftCard.occasion || "birthday"}
-                              customOccasion={giftCard.customOccasion || ""}
-                              recipientName={giftCard.recipientName || ""}
-                             recipientPhone={giftCard.recipientPhone || null}
-                             senderPhone={giftCard.senderPhone || null}
-                              senderName={giftCard.senderName || ""}
-                              message={giftCard.message || ""}
-                             internet={giftCard.internet || null}
-                             voice={giftCard.voice || null}
-                             dkVoucher={giftCard.dkVoucher || null}
-                             ftVoucher={giftCard.ftVoucher || null}
-                              oneYear={giftCard.oneYear || false}
-                              totalPrice={giftCard.totalPrice || giftCard.totalValue || 0}
-                              isPaid={true}
-                            />
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
