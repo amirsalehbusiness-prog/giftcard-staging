@@ -42,7 +42,6 @@ type CompletedGiftCard = {
 };
 
 export function CartManager() {
-export function SocialFeed() {
   const { cartItems, removeFromCart, clearCart, createUserAccount, loggedInUser } = useUser();
   const { createSocialProfile, socialProfiles, createPost } = useSocial();
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
@@ -55,6 +54,10 @@ export function SocialFeed() {
     if (occasion === "custom") return customOccasion || "بهانه دلخواه";
     const found = OCCASIONS.find((o) => o.key === occasion);
     return found ? found.label : occasion;
+  };
+
+  const generateUniqueId = () => {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   };
 
   const handlePaymentForItem = async (item: CartItem) => {
