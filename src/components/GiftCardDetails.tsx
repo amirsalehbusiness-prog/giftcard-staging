@@ -253,7 +253,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
             <div className="grid grid-cols-2 gap-2">
               {(Array.isArray(giftCard.vouchers) ? giftCard.vouchers : []).map((voucher, index) => (
                 <div 
-                  key={index}
+                  key={voucher.id || `voucher-${index}`}
                   className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"
                 >
                   {getVoucherIcon(voucher.type || '')}
@@ -363,7 +363,7 @@ export function GiftCardDetails({ giftCard, onUseVoucher }: GiftCardDetailsProps
               <div className="space-y-3">
                 {(Array.isArray(giftCard.vouchers) ? giftCard.vouchers : []).map((voucher, index) => (
                   <div 
-                    key={index}
+                    key={voucher.id || `voucher-detail-${index}`}
                     className="border rounded-xl p-4 bg-white"
                   >
                     <div className="flex items-center justify-between mb-3">
