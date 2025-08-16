@@ -19,6 +19,7 @@ import { useSocial } from '../contexts/SocialContext';
 import { OCCASIONS } from '../data/occasions';
 import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS } from '../data/packages';
 import { formatPrice } from '../utils/pricing';
+import { generateUniqueId } from '../lib/utils';
 import { PreviewCard } from './PreviewCard';
 import type { CartItem } from '../types';
 

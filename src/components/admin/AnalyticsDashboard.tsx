@@ -258,12 +258,13 @@ export function AnalyticsDashboard() {
                 const percentage = (voucher.amount / totalSales) * 100;
                 
                 const colors = ['bg-purple-500', 'bg-blue-500', 'bg-green-500', 'bg-orange-500'];
+                const colorIndex = analyticsData.voucherSales.indexOf(voucher);
                 
                 return (
                   <div key={voucher.voucherType} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-full ${colors[index % colors.length]}`} />
+                        <div className={`w-3 h-3 rounded-full ${colors[colorIndex % colors.length]}`} />
                         <span className="font-medium">{voucher.voucherType}</span>
                       </div>
                       <div className="text-sm text-gray-600">
@@ -272,7 +273,7 @@ export function AnalyticsDashboard() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
-                        className={`h-2 rounded-full ${colors[analyticsData.voucherSales.indexOf(voucher) % colors.length]}`}
+                        className={`h-2 rounded-full ${colors[colorIndex % colors.length]}`}
                         style={{ width: `${percentage}%` }}
                       />
                     </div>

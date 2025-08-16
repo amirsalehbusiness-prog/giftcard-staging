@@ -20,7 +20,7 @@ import { OCCASIONS } from '../../data/occasions';
 import { INTERNET_PACKS, VOICE_PACKS, DIGIKALA_VOUCHERS, FLYTODAY_VOUCHERS } from '../../data/packages';
 import { formatPrice } from '../../utils/pricing';
 import { PreviewCard } from "../PreviewCard";
-import type { CartItem } from '../types';
+import type { CartItem } from '../../types';
 
 type CompletedGiftCard = {
   id: string;
