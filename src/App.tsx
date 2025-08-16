@@ -29,7 +29,7 @@ function AppContent() {
   const [step, setStep] = useState<number>(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [isPaid, setIsPaid] = useState<boolean>(false);
-  const { loggedInUser, cartItems } = useUser();
+  const { loggedInUser, cartItems, setLoggedInUser } = useUser();
 
   // Event listener برای انتقال به صفحه لاگین از ReviewCard
   React.useEffect(() => {
@@ -177,7 +177,10 @@ function AppContent() {
 
         <main className="mx-auto max-w-7xl px-4 py-6">
           <UserProfile 
-            onLogout={() => setCurrentPage("home")}
+            onLogout={() => {
+              setLoggedInUser(null);
+              setCurrentPage("home");
+            }}
             onNavigateToSocial={() => setCurrentPage("social")}
           />
         </main>
