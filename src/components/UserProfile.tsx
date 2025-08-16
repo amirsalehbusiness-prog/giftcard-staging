@@ -125,7 +125,15 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
   const filteredGiftCards = useMemo(() => {
     if (!currentUser?.giftCards) return [];
     
-    let filtered = currentUser.giftCards;
+    // Get all gift cards from all users
+    let allGiftCards: GiftCard[] = [];
+    userAccounts.forEach(account => {
+      if (account.giftCards) {
+        allGiftCards = [...allGiftCards, ...account.giftCards];
+      }
+    });
+    
+    let filtered = allGiftCards;
     
     // Filter by view type (received vs sent)
     if (giftCardView === 'received') {
@@ -163,7 +171,7 @@ export function UserProfile({ onLogout, onNavigateToSocial }: UserProfileProps) 
     }
     
     return filtered.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
-  }, [currentUser?.giftCards, filterType, searchQuery, giftCardView, currentUser?.phone]);
+  }, [userAccounts, filterType, searchQuery, giftCardView, currentUser?.phone]);
 
   const getOccasionLabel = (occasion: string) => {
     const found = OCCASIONS.find(o => o.key === occasion);
